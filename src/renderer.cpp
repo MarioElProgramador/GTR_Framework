@@ -10,6 +10,8 @@
 #include "scene.h"
 #include "extra/hdre.h"
 
+#include <algorithm>
+
 
 using namespace GTR;
 
@@ -21,6 +23,21 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 	// Clear the color and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	checkGLErrors();
+
+	//render lights
+	for (int i = 0; i < scene->entities.size(); ++i)
+	{
+		BaseEntity* ent = scene->entities[i];
+		if (!ent->visible)
+			continue;
+
+		//is a light!
+		if (ent->entity_type == LIGHT)
+		{
+			LightEntity* lent = (GTR::LightEntity*)ent;
+			lights.push_back(lent);
+		}
+	}
 
 	//render entities
 	for (int i = 0; i < scene->entities.size(); ++i)
@@ -37,6 +54,20 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 				renderPrefab(ent->model, pent->prefab, camera);
 		}
 	}
+
+	// sorting of the prefabs
+	std::sort(render_calls.begin(), render_calls.end(), [](RenderCall rc1, RenderCall rc2) {
+		if (rc1.material->alpha_mode == GTR::eAlphaMode::BLEND && rc2.material->alpha_mode == GTR::eAlphaMode::BLEND) rc1.distance_to_camera > rc2.distance_to_camera;
+		return rc1.distance_to_camera < rc2.distance_to_camera;
+		});
+
+	int sizeRC = render_calls.size();
+	for (int i = 0; i < sizeRC; i++) {
+		renderMeshWithMaterial(render_calls[i].model, render_calls[i].mesh, render_calls[i].material, camera);
+	}
+
+	render_calls.clear();
+
 }
 
 //renders all the prefab
@@ -65,9 +96,16 @@ void Renderer::renderNode(const Matrix44& prefab_model, GTR::Node* node, Camera*
 		//if bounding box is inside the camera frustum then the object is probably visible
 		if (camera->testBoxInFrustum(world_bounding.center, world_bounding.halfsize) )
 		{
-			//render node mesh
-			renderMeshWithMaterial( node_model, node->mesh, node->material, camera );
-			//node->mesh->renderBounding(node_model, true);
+			//render node mesh with priority
+			RenderCall rc;
+			Vector3 nodepos = node_model.getTranslation();
+			rc.mesh = node->mesh;
+			rc.material = node->material;
+			rc.model = node_model;
+			rc.distance_to_camera = nodepos.distance(camera->eye);
+			if (node->material->alpha_mode == GTR::eAlphaMode::BLEND) 
+				rc.distance_to_camera += INFINITE;
+			render_calls.push_back(rc);
 		}
 	}
 
@@ -87,6 +125,9 @@ void Renderer::renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Mat
 	//define locals to simplify coding
 	Shader* shader = NULL;
 	Texture* texture = NULL;
+	Scene* scene = GTR::Scene::instance;
+
+	int n_lights = lights.size();
 
 	texture = material->color_texture.texture;
 	//texture = material->emissive_texture;
@@ -135,6 +176,10 @@ void Renderer::renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Mat
 
 	//this is used to say which is the alpha threshold to what we should not paint a pixel on the screen (to cut polygons according to texture alpha)
 	shader->setUniform("u_alpha_cutoff", material->alpha_mode == GTR::eAlphaMode::MASK ? material->alpha_cutoff : 0);
+	shader->setUniform("u_ambient_light", scene->ambient_light);
+
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 	//do the draw call that renders the mesh into the screen
 	mesh->render(GL_TRIANGLES);
@@ -144,6 +189,7 @@ void Renderer::renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Mat
 
 	//set the render state as it was before to avoid problems with future renders
 	glDisable(GL_BLEND);
+	glDepthFunc(GL_LESS);
 }
 
 

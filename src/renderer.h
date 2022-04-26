@@ -9,15 +9,23 @@ namespace GTR {
 	class Prefab;
 	class Material;
 	
-	// This class is in charge of rendering anything in our system.
-	// Separating the render from anything else makes the code cleaner
-	class Renderer
-	{
-
+	// Esta clase recoge información del prefab referente al render
+	class RenderCall {
 	public:
 
-		//add here your functions
-		//...
+		Mesh* mesh;
+		Material* material;
+		Matrix44 model;
+		float distance_to_camera;
+	};
+
+	// This class is in charge of rendering anything in our system.
+	// Separating the render from anything else makes the code cleaner
+	class Renderer {
+	public:
+
+		std::vector<RenderCall> render_calls;
+		std::vector<LightEntity*> lights;
 
 		//renders several elements of the scene
 		void renderScene(GTR::Scene* scene, Camera* camera);

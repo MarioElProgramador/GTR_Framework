@@ -25,7 +25,7 @@ GTR::BaseEntity* selected_entity = nullptr;
 FBO* fbo = nullptr;
 Texture* texture = nullptr;
 
-float cam_speed = 10;
+float cam_speed = 50;
 
 Application::Application(int window_width, int window_height, SDL_Window* window)
 {
@@ -66,7 +66,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	//prefab = GTR::Prefab::Get("data/prefabs/gmc/scene.gltf");
 
 	scene = new GTR::Scene();
-	if (!scene->load("data/scene.json"))
+	if (!scene->load("data/scene_single.json"))
 		exit(1);
 
 	camera->lookAt(scene->main_camera.eye, scene->main_camera.center, Vector3(0, 1, 0));
