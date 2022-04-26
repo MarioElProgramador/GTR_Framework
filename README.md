@@ -1,3 +1,6 @@
+Mario Valenzuela Pinazo 217326
+mario.valenzuela01@estudiant.upf.edu
+
 # GTR_Framework
 OpenGL C++ Framework used for the Grafics a Temps Real course at Universitat Pompeu Fabra.
 
