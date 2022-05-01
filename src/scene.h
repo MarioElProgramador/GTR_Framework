@@ -41,6 +41,7 @@ namespace GTR {
 		eEntityType entity_type;
 		Matrix44 model;
 		bool visible;
+
 		BaseEntity() { entity_type = NONE; visible = true; }
 		virtual ~BaseEntity() {}
 		virtual void renderInMenu();
@@ -71,6 +72,7 @@ namespace GTR {
 		float cone_angle;
 		float cone_exp;
 		float area_size;
+		Vector3 target;
 
 		LightEntity();
 		virtual void renderInMenu();
@@ -86,6 +88,8 @@ namespace GTR {
 		Vector3 background_color;
 		Vector3 ambient_light;
 		Camera main_camera;
+
+		bool multilight;
 
 		Scene();
 

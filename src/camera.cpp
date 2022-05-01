@@ -8,8 +8,8 @@ Camera* Camera::current = NULL;
 
 Camera::Camera()
 {
-	lookAt( Vector3(0, 0, 0), Vector3(0, 0, -1), Vector3(0, 1, 0) );
-	setOrthographic(-100,100,-100, 100,-100,100);
+	lookAt(Vector3(0, 0, 0), Vector3(0, 0, -1), Vector3(0, 1, 0));
+	setOrthographic(-100, 100, -100, 100, -100, 100);
 }
 
 void Camera::enable()

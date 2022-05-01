@@ -185,6 +185,11 @@ void GTR::PrefabEntity::renderInMenu()
 		cone_angle = 45;
 		cone_exp = 60;
 		area_size = 1000;
+
+		//target.set(0, 0, 0);
+		//shadow_bias = 0;
+		//fbo = NULL;
+		//shadowmap = NULL;
 	}
 
 	void GTR::LightEntity::configure(cJSON* json)
@@ -199,6 +204,7 @@ void GTR::PrefabEntity::renderInMenu()
 		cone_angle = readJSONNumber(json, "cone_angle", cone_angle);
 		cone_exp = readJSONNumber(json, "cone_exp", cone_exp);
 		area_size = readJSONNumber(json, "area_size", area_size);
+		target = readJSONVector3(json, "target", target);
 	}
 
 	void GTR::LightEntity::renderInMenu()
@@ -207,13 +213,18 @@ void GTR::PrefabEntity::renderInMenu()
 		std::string type_str;
 		switch (light_type)
 		{
-		case eLightType::POINT: type_str = "POINT"; break;
-		case eLightType::SPOT: type_str = "SPOT"; break;
-		case eLightType::DIRECTIONAL: type_str = "DIRECTIONAL"; break;
+			case eLightType::POINT: type_str = "POINT"; break;
+			case eLightType::SPOT: type_str = "SPOT"; break;
+			case eLightType::DIRECTIONAL: type_str = "DIRECTIONAL"; break;
 		default: break;
 		}
 
 		// Debug
-		ImGui::Text("LightType:");
+		ImGui::Text("LightType: %s", type_str.c_str());
+		ImGui::ColorEdit3("Color", color.v);
+		ImGui::DragFloat("Intensity", &intensity);
+		ImGui::DragFloat("Max distance", &max_distance);
+		ImGui::DragFloat("Cone angle", &cone_angle);
+		ImGui::DragFloat("Cone exp", &cone_exp);
 	}
 

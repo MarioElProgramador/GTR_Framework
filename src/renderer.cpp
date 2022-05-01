@@ -9,8 +9,9 @@
 #include "utils.h"
 #include "scene.h"
 #include "extra/hdre.h"
+#include "fbo.h"
 
-#include <algorithm>
+#include <algorithm> // Agregado para hacer el sort
 
 
 using namespace GTR;
@@ -23,6 +24,10 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 	// Clear the color and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	checkGLErrors();
+
+	// Clear entities
+	lights.clear();
+	render_calls.clear();
 
 	//render lights
 	for (int i = 0; i < scene->entities.size(); ++i)
@@ -56,7 +61,8 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 	}
 
 	// sorting of the prefabs
-	std::sort(render_calls.begin(), render_calls.end(), [](RenderCall rc1, RenderCall rc2) {
+	std::sort(render_calls.begin(), render_calls.end(), [](RenderCall rc1, RenderCall rc2) 
+		{
 		if (rc1.material->alpha_mode == GTR::eAlphaMode::BLEND && rc2.material->alpha_mode == GTR::eAlphaMode::BLEND) rc1.distance_to_camera > rc2.distance_to_camera;
 		return rc1.distance_to_camera < rc2.distance_to_camera;
 		});
@@ -143,8 +149,9 @@ void Renderer::renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Mat
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
-	else
+	else {
 		glDisable(GL_BLEND);
+	}
 
 	//select if render both sides of the triangles
 	if(material->two_sided)
@@ -154,7 +161,8 @@ void Renderer::renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Mat
     assert(glGetError() == GL_NO_ERROR);
 
 	//chose a shader
-	shader = Shader::Get("texture");
+	if (scene->multilight) shader = Shader::Get("multilight");
+	else shader = Shader::Get("singlelight");
 
     assert(glGetError() == GL_NO_ERROR);
 
@@ -173,17 +181,134 @@ void Renderer::renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Mat
 	shader->setUniform("u_color", material->color);
 	if(texture)
 		shader->setUniform("u_texture", texture, 0);
+	texture = material->emissive_texture.texture;
+	
+	if (texture)
+		shader->setUniform("u_texture_emissive", texture, 1);
+	texture = material->occlusion_texture.texture;
+	
+	if (texture)
+		shader->setUniform("u_texture_occlusion", texture, 2);
+	texture = material->normal_texture.texture;
+	
+	if (texture)
+		shader->setUniform("u_texture_normal", texture, 3);
 
 	//this is used to say which is the alpha threshold to what we should not paint a pixel on the screen (to cut polygons according to texture alpha)
 	shader->setUniform("u_alpha_cutoff", material->alpha_mode == GTR::eAlphaMode::MASK ? material->alpha_cutoff : 0);
-	shader->setUniform("u_ambient_light", scene->ambient_light);
+	shader->setUniform("u_emissive_factor", material->emissive_factor);
 
+	shader->setUniform("u_ambient_light", scene->ambient_light);
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-	//do the draw call that renders the mesh into the screen
-	mesh->render(GL_TRIANGLES);
+	// Caso no luces
+	if (!n_lights) {
+		if (material->alpha_mode == GTR::eAlphaMode::BLEND)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+			glDisable(GL_BLEND);
+		shader->setUniform("u_light_color", Vector3());
+		mesh->render(GL_TRIANGLES);
+	}
+	// Multipass
+	else if (scene->multilight) {
+		for (int i = 0; i < n_lights; i++) {
+			if (i == 0) {
+				glDisable(GL_BLEND);
+				if (material->alpha_mode == GTR::eAlphaMode::BLEND)
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				}
+				else {
+					glDisable(GL_BLEND);
+				}
 
+			}
+			else {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				glEnable(GL_BLEND);
+			}
+			LightEntity* light = lights[i];
+			shader->setUniform("u_light_color", light->color * light->intensity);
+			shader->setUniform("u_light_position", light->model * Vector3());
+			shader->setUniform("u_light_max_distance", light->max_distance);
+
+			shader->setUniform("u_light_cone", Vector3(light->cone_angle, light->cone_exp, cos(light->cone_angle * DEG2RAD)));
+			shader->setUniform("u_light_front", light->model.rotateVector(Vector3(0, 0, -1)));
+
+			if (light->light_type == GTR::eLightType::DIRECTIONAL) {
+				shader->setUniform("u_light_type", 2);
+				shader->setUniform("u_light_vector", light->model * Vector3() - light->target);
+			}
+			else if (light->light_type == GTR::eLightType::SPOT) shader->setUniform("u_light_type", 1);
+			else shader->setUniform("u_light_type", 0);
+
+			/*if (light->shadowmap) {
+				shader->setUniform("u_light_cast_shadows", 1);
+				shader->setUniform("u_light_shadowmap", light->shadowmap, 4);
+				shader->setUniform("u_light_shadowmap_vp", light->light_camera->viewprojection_matrix);
+				shader->setUniform("u_light_shadow_bias", light->shadow_bias);
+			}
+			else {
+				shader->setUniform("u_light_cast_shadows", 0);
+			}
+			*/
+
+			//do the draw call that renders the mesh into the screen
+			mesh->render(GL_TRIANGLES);
+
+			shader->setUniform("u_ambient_light", Vector3());
+			shader->setUniform("u_emissive_factor", Vector3());
+		}
+	}
+
+	// Singlepass
+	else {
+		const int MAX_LIGHTS = 5;
+		Vector3 light_position[MAX_LIGHTS];
+		Vector3 light_color[MAX_LIGHTS];
+		Vector3 light_front[MAX_LIGHTS];
+		Vector3 light_cone[MAX_LIGHTS];
+		Vector3 light_vector[MAX_LIGHTS];
+		int light_type[MAX_LIGHTS];
+		float light_max_distance[MAX_LIGHTS];
+
+		for (int i = 0; i < n_lights; i++) {
+			if (i < n_lights) {
+				light_position[i] = lights[i]->model * Vector3();
+				light_color[i] = lights[i]->color * lights[i]->intensity;
+				light_max_distance[i] = lights[i]->max_distance;
+				light_front[i] = lights[i]->model.rotateVector(Vector3(0, 0, -1));
+				light_cone[i] = Vector3(lights[i]->cone_angle, lights[i]->cone_exp, cos(lights[i]->cone_angle * DEG2RAD));
+
+
+				light_vector[i] = lights[i]->model * Vector3() - lights[i]->target;
+				if (lights[i]->light_type == GTR::eLightType::DIRECTIONAL) light_type[i] = 2;
+				else if (lights[i]->light_type == GTR::eLightType::SPOT) light_type[i] = 1;
+				else light_type[i] = 0;
+			}
+		}
+		shader->setUniform3Array("u_light_position", (float*)&light_position, n_lights);
+		shader->setUniform3Array("u_light_color", (float*)&light_color, n_lights);
+
+		shader->setUniform3Array("u_light_front", (float*)&light_front, n_lights);
+		shader->setUniform3Array("u_light_cone", (float*)&light_cone, n_lights);
+		shader->setUniform3Array("u_light_vector", (float*)&light_vector, n_lights);
+		shader->setUniform1Array("u_light_max_distance", (float*)&light_max_distance, n_lights);
+		shader->setUniform1Array("u_light_type", (int*)&light_type, n_lights);
+		shader->setUniform("u_num_lights", n_lights);
+		
+		//do the draw call that renders the mesh into the screen
+		mesh->render(GL_TRIANGLES);
+
+		shader->setUniform("u_ambient_light", Vector3());
+	}
+	
 	//disable shader
 	shader->disable();
 
