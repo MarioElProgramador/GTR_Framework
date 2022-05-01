@@ -1,4 +1,4 @@
-Mario Valenzuela Pinazo 217326
+Mario Valenzuela Pinazo 217326 \n
 mario.valenzuela01@estudiant.upf.edu
 
 # GTR_Framework
