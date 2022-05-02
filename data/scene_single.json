@@ -20,6 +20,14 @@
 			"angle": -45
 		},
 		{
+			"name": "oldcar",
+			"type": "PREFAB",
+			"filename": "prefabs/old_rusty_car/scene.gltf",
+			"position": [ -50, 0, 300 ],
+			"scale": [ 0.4, 0.4, 0.4 ],
+			"angle": 45
+		},
+		{
 			"name": "house",
 			"type": "PREFAB",
 			"filename": "prefabs/house_test/scene.gltf",

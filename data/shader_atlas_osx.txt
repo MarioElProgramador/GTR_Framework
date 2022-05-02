@@ -1,9 +1,10 @@
-//example of some shaders compiled
+// ###################################### SHADERS ######################################  
 flat basic.vs flat.fs
 texture basic.vs texture.fs
 
-\basic.vs
+// ------------------------------------------------------------------------------
 
+\basic.vs
 
 attribute vec3 a_vertex;
 attribute vec3 a_normal;
@@ -41,8 +42,9 @@ void main()
 	gl_Position = u_viewprojection * vec4( v_world_position, 1.0 );
 }
 
-\flat.fs
+// ------------------------------------------------------------------------------
 
+\flat.fs
 
 uniform vec4 u_color;
 
@@ -51,6 +53,7 @@ void main()
 	gl_FragColor = u_color;
 }
 
+// ------------------------------------------------------------------------------
 
 \texture.fs
 
@@ -77,6 +80,8 @@ void main()
 	gl_FragColor = color;
 }
 
+// ------------------------------------------------------------------------------
+
 \quad.vs
 
 attribute vec3 a_vertex;
@@ -89,6 +94,7 @@ void main()
 	gl_Position = vec4( a_vertex, 1.0 );
 }
 
+// ------------------------------------------------------------------------------
 
 \multi.fs
 
@@ -119,6 +125,7 @@ void main()
 	gl_FragData[1] = vec4(N,1.0);
 }
 
+// ------------------------------------------------------------------------------
 
 \depth.fs
 
@@ -136,6 +143,8 @@ void main()
 	float color = n * (z + 1.0) / (f + n - z * (f - n));
 	gl_FragColor = vec4(color);
 }
+
+// ------------------------------------------------------------------------------
 
 \instanced.vs
 
