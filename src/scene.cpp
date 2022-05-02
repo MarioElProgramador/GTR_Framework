@@ -56,6 +56,7 @@ bool GTR::Scene::load(const char* filename)
 	main_camera.center = readJSONVector3(json, "camera_target", main_camera.center);
 	main_camera.fov = readJSONNumber(json, "camera_fov", main_camera.fov);
 
+
 	//entities
 	cJSON* entities_json = cJSON_GetObjectItemCaseSensitive(json, "entities");
 	cJSON* entity_json;
@@ -182,14 +183,15 @@ void GTR::PrefabEntity::renderInMenu()
 		color.set(1, 1, 1);
 		intensity = 1;
 		max_distance = 100;
-		cone_angle = 45;
-		cone_exp = 60;
-		area_size = 1000;
-
-		//target.set(0, 0, 0);
-		//shadow_bias = 0;
-		//fbo = NULL;
-		//shadowmap = NULL;
+		cone_angle = 10;
+		cone_exp = 10;
+		area_size = 10;
+		target.set(0, 0, 0);
+		
+		/*shadow_bias = 0.0;
+		fbo = NULL;
+		shadowmap = NULL;
+		light_camera = NULL;*/
 	}
 
 	void GTR::LightEntity::configure(cJSON* json)
