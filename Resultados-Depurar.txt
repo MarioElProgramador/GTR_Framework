@@ -1,0 +1,92 @@
+﻿'framework_debug.exe' (Win32): 'C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework - copia\framework_debug.exe' cargado. Símbolos cargados.
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ntdll.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\kernel32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\KernelBase.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\user32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\win32u.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\gdi32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\gdi32full.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\msvcp_win.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ucrtbase.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\imm32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework - copia\SDL2.dll' cargado. El módulo se compiló sin símbolos.
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\msvcrt.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ole32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\rpcrt4.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\combase.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\oleaut32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\shell32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\opengl32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\advapi32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\sechost.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\glu32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\msvcp140d.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\vcruntime140d.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ucrtbased.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\version.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\winmm.dll' cargado. 
+El subproceso 0x533c terminó con código 0 (0x0).
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\uxtheme.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\kernel.appcore.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\bcryptprimitives.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\clbcatq.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\XAudio2_7.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\dinput8.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\hid.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\InputHost.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\SHCore.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\CoreMessaging.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ws2_32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\CoreUIComponents.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\propsys.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ntmarta.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\WinTypes.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\WinTypes.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\WinTypes.dll' descargado
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\setupapi.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\cfgmgr32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\bcrypt.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\devobj.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\wintrust.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\crypt32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\msasn1.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\XInput1_4.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\msctf.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\windows.storage.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\wldp.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\shlwapi.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\nvami.inf_amd64_a3d5bcc37ff12fed\nvdlist.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\AppXDeploymentClient.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\nvami.inf_amd64_a3d5bcc37ff12fed\nvdlist.dll' descargado
+El subproceso 0x36d4 terminó con código 0 (0x0).
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_e96a5623ed9fa7ca\ig9icd32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\dwmapi.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\dxgi.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_e96a5623ed9fa7ca\igdml32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ResourcePolicyClient.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\ResourcePolicyClient.dll' descargado
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\nvami.inf_amd64_a3d5bcc37ff12fed\nvdlist.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_e96a5623ed9fa7ca\igdgmm32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\nvami.inf_amd64_a3d5bcc37ff12fed\nvdlist.dll' descargado
+El subproceso 0x1884 terminó con código 0 (0x0).
+'framework_debug.exe' (Win32): 'C:\Windows\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_e96a5623ed9fa7ca\igc32.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\powrprof.dll' cargado. 
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\umpdc.dll' cargado. 
+El subproceso 0x2654 terminó con código 1 (0x1).
+El subproceso 0x2a50 terminó con código 1 (0x1).
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\TextInputFramework.dll' cargado. 
+El subproceso 0x310c terminó con código 1 (0x1).
+El subproceso 0x1a44 terminó con código 0 (0x0).
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\AppXDeploymentClient.dll' descargado
+'framework_debug.exe' (Win32): 'C:\Windows\SysWOW64\XAudio2_7.dll' descargado
+El subproceso 0x30c0 terminó con código 0 (0x0).
+El subproceso 0x4a90 terminó con código 0 (0x0).
+El subproceso 0xb30 terminó con código 0 (0x0).
+El subproceso 0x26f4 terminó con código 0 (0x0).
+El subproceso 0xe94 terminó con código 0 (0x0).
+El subproceso 0x3854 terminó con código 0 (0x0).
+El subproceso 0x2718 terminó con código 0 (0x0).
+El subproceso 0x43fc terminó con código 0 (0x0).
+El subproceso 0x4630 terminó con código 0 (0x0).
+El subproceso 0x1c50 terminó con código 0 (0x0).
+El programa '[15184] framework_debug.exe' terminó con código 0 (0x0).
