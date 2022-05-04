@@ -66,7 +66,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	//prefab = GTR::Prefab::Get("data/prefabs/gmc/scene.gltf");
 
 	scene = new GTR::Scene();
-	if (!scene->load("data/scene_single.json"))
+	if (!scene->load("data/scene.json"))
 		exit(1);
 
 	camera->lookAt(scene->main_camera.eye, scene->main_camera.center, Vector3(0, 1, 0));
@@ -106,7 +106,7 @@ void Application::render(void)
 
 	//Draw the floor grid, helpful to have a reference point
 	if(render_debug)
-		drawGrid();
+		//drawGrid(); // Desactivada por que se solapa
 
     glDisable(GL_DEPTH_TEST);
     //render anything in the gui after this

@@ -6,7 +6,9 @@
 #include <string>
 
 //forward declaration
-class cJSON; 
+class cJSON;
+class FBO;
+class Texture;
 
 
 //our namespace
@@ -54,12 +56,11 @@ namespace GTR {
 	public:
 		std::string filename;
 		Prefab* prefab;
-		
+
 		PrefabEntity();
 		virtual void renderInMenu();
 		virtual void configure(cJSON* json);
 	};
-
 
 	//represents one light in the scene
 	class LightEntity : public GTR::BaseEntity
@@ -73,6 +74,13 @@ namespace GTR {
 		float cone_exp;
 		float area_size;
 		Vector3 target;
+
+		bool cast_shadows;
+		float shadow_bias;
+
+		FBO* fbo;
+		Texture* shadowmap;
+		Camera* light_camera;
 
 		LightEntity();
 		virtual void renderInMenu();
@@ -90,6 +98,9 @@ namespace GTR {
 		Camera main_camera;
 
 		bool multilight;
+		bool emissive;
+		bool occlussion;
+		bool normal;
 
 		Scene();
 
@@ -105,4 +116,4 @@ namespace GTR {
 
 };
 
-#endif
+#endif#endif

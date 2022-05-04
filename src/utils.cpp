@@ -1,9 +1,9 @@
 #include "utils.h"
 
 #ifdef WIN32
-	#include <windows.h>
+#include <windows.h>
 #else
-	#include <sys/time.h>
+#include <sys/time.h>
 #endif
 
 #include "includes.h"
@@ -17,16 +17,16 @@
 
 long getTime()
 {
-	#ifdef WIN32
-		return GetTickCount();
-	#else
-		struct timeval tv;
-		gettimeofday(&tv,NULL);
-		return (int)(tv.tv_sec*1000 + (tv.tv_usec / 1000));
-	#endif
+#ifdef WIN32
+	return GetTickCount();
+#else
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (int)(tv.tv_sec * 1000 + (tv.tv_usec / 1000));
+#endif
 }
 
-float * snapshot()
+float* snapshot()
 {
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -36,7 +36,7 @@ float * snapshot()
 	int width = viewport[2];
 	int height = viewport[3];
 
-	float * data = new float[width * height * 4]; // (R, G, B, A)
+	float* data = new float[width * height * 4]; // (R, G, B, A)
 
 	if (!data)
 		return 0;
@@ -59,39 +59,39 @@ void* getGLProcAddress(const char* name)
 #endif
 
 #ifdef WIN32
-	#include <direct.h>
-	#define GetCurrentDir _getcwd
+#include <direct.h>
+#define GetCurrentDir _getcwd
 #else
-	#include <unistd.h>
-	#define GetCurrentDir getcwd
+#include <unistd.h>
+#define GetCurrentDir getcwd
 #endif
 
 std::string getPath()
 {
-    std::string fullpath;
-    // ----------------------------------------------------------------------------
-    // This makes relative paths work in C++ in Xcode by changing directory to the Resources folder inside the .app bundle
+	std::string fullpath;
+	// ----------------------------------------------------------------------------
+	// This makes relative paths work in C++ in Xcode by changing directory to the Resources folder inside the .app bundle
 #ifdef __APPLE__
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
-    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-    char path[PATH_MAX];
-    if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-    {
-        // error!
-    }
-    CFRelease(resourcesURL);
-    chdir(path);
-    fullpath = path;
+	CFBundleRef mainBundle = CFBundleGetMainBundle();
+	CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+	char path[PATH_MAX];
+	if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8*)path, PATH_MAX))
+	{
+		// error!
+	}
+	CFRelease(resourcesURL);
+	chdir(path);
+	fullpath = path;
 #else
-	 char cCurrentPath[1024];
-	 if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-		 return "";
+	char cCurrentPath[1024];
+	if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+		return "";
 
 	cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
 	fullpath = cCurrentPath;
 
 #endif    
-    return fullpath;
+	return fullpath;
 }
 
 bool readFile(const std::string& filename, std::string& content)
@@ -100,7 +100,7 @@ bool readFile(const std::string& filename, std::string& content)
 
 	long count = 0;
 
-	FILE *fp = fopen(filename.c_str(), "rb");
+	FILE* fp = fopen(filename.c_str(), "rb");
 	if (fp == NULL)
 	{
 		std::cerr << "::readFile: file not found " << filename << std::endl;
@@ -139,19 +139,19 @@ bool readFileBin(const std::string& filename, std::vector<unsigned char>& buffer
 
 bool checkGLErrors()
 {
-	#ifndef _DEBUG
-        return true;
-    #endif
-    
+#ifndef _DEBUG
+	return true;
+#endif
+
 	GLenum errCode;
-	const GLubyte *errString;
+	const GLubyte* errString;
 
 	if ((errCode = glGetError()) != GL_NO_ERROR) {
-		#ifndef GCC
+#ifndef GCC
 		errString = gluErrorString(errCode);
-			std::cerr << "OpenGL Error: " << (errString ? (const char*)errString : "NO ERROR STRING")<< std::endl;
-		#endif
-        assert(0);
+		std::cerr << "OpenGL Error: " << (errString ? (const char*)errString : "NO ERROR STRING") << std::endl;
+#endif
+		assert(0);
 		return false;
 	}
 
@@ -163,19 +163,19 @@ void stdlog(std::string str)
 	std::cout << str << std::endl;
 }
 
-std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems) {
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
+std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems) {
+	std::stringstream ss(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, elems);
-    return elems;
+std::vector<std::string> split(const std::string& s, char delim) {
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
 }
 
 std::string join(std::vector<std::string>& strings, const char* delim)
@@ -186,16 +186,16 @@ std::string join(std::vector<std::string>& strings, const char* delim)
 	return str;
 }
 
-Vector2 getDesktopSize( int display_index )
+Vector2 getDesktopSize(int display_index)
 {
-  SDL_DisplayMode current;
-  // Get current display mode of all displays.
-  int should_be_zero = SDL_GetCurrentDisplayMode(display_index, &current);
-  return Vector2( (float)current.w, (float)current.h );
+	SDL_DisplayMode current;
+	// Get current display mode of all displays.
+	int should_be_zero = SDL_GetCurrentDisplayMode(display_index, &current);
+	return Vector2((float)current.w, (float)current.h);
 }
 
 
-bool drawText(float x, float y, std::string text, Vector3 c, float scale )
+bool drawText(float x, float y, std::string text, Vector3 c, float scale)
 {
 	static char buffer[99999]; // ~500 chars
 	int num_quads;
@@ -307,7 +307,7 @@ std::string getGPUStats()
 		nCurAvailMemoryInKB = 0;
 	}
 
-	std::string str = "FPS: " + std::to_string(Application::instance->fps) + " DCS: " + std::to_string(Mesh::num_meshes_rendered) + " Tris: " + std::to_string(long(Mesh::num_triangles_rendered * 0.001)) + "Ks  VRAM: " + std::to_string(int((nTotalMemoryInKB-nCurAvailMemoryInKB) * 0.001)) + "MBs / " + std::to_string(int(nTotalMemoryInKB * 0.001)) + "MBs";
+	std::string str = "FPS: " + std::to_string(Application::instance->fps) + " DCS: " + std::to_string(Mesh::num_meshes_rendered) + " Tris: " + std::to_string(long(Mesh::num_triangles_rendered * 0.001)) + "Ks  VRAM: " + std::to_string(int((nTotalMemoryInKB - nCurAvailMemoryInKB) * 0.001)) + "MBs / " + std::to_string(int(nTotalMemoryInKB * 0.001)) + "MBs";
 	Mesh::num_meshes_rendered = 0;
 	Mesh::num_triangles_rendered = 0;
 	return str;
@@ -330,7 +330,7 @@ void drawGrid()
 	Shader* grid_shader = Shader::getDefaultShader("grid");
 	grid_shader->enable();
 	Matrix44 m;
-	m.translate(floor(Camera::current->eye.x / 100.0)*100.0f, 0.0f, floor(Camera::current->eye.z / 100.0f)*100.0f);
+	m.translate(floor(Camera::current->eye.x / 100.0) * 100.0f, 0.0f, floor(Camera::current->eye.z / 100.0f) * 100.0f);
 	grid_shader->setUniform("u_color", Vector4(0.7, 0.7, 0.7, 0.7));
 	grid_shader->setUniform("u_model", m);
 	grid_shader->setUniform("u_camera_position", Camera::current->eye);
@@ -343,7 +343,7 @@ void drawGrid()
 
 void ImGuiMatrix44(Matrix44& matrix, const char* text)
 {
-	#ifndef SKIP_IMGUI
+#ifndef SKIP_IMGUI
 	if (ImGui::TreeNode((void*)&matrix, "Model"))
 	{
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -354,7 +354,7 @@ void ImGuiMatrix44(Matrix44& matrix, const char* text)
 		ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, matrix.m);
 		ImGui::TreePop();
 	}
-	#endif
+#endif
 }
 
 char* fetchWord(char* data, char* word)
@@ -370,7 +370,7 @@ char* fetchWord(char* data, char* word)
 char* fetchFloat(char* data, float& v)
 {
 	char w[255];
-	data = fetchWord(data,w);
+	data = fetchWord(data, w);
 	v = atof(w);
 	return data;
 }
@@ -394,7 +394,7 @@ char* fetchEndLine(char* data)
 	return data;
 }
 
-char* fetchBufferFloat(char* data, std::vector<float>& vector, int num )
+char* fetchBufferFloat(char* data, std::vector<float>& vector, int num)
 {
 	int pos = 0;
 	char word[255];
@@ -447,7 +447,7 @@ char* fetchBufferVec3(char* data, std::vector<Vector3>& vector)
 	std::vector<float> floats;
 	data = fetchBufferFloat(data, floats);
 	vector.resize(floats.size() / 3);
-	memcpy(&vector[0], &floats[0], sizeof(float)*floats.size());
+	memcpy(&vector[0], &floats[0], sizeof(float) * floats.size());
 	return data;
 }
 
@@ -457,7 +457,7 @@ char* fetchBufferVec2(char* data, std::vector<Vector2>& vector)
 	std::vector<float> floats;
 	data = fetchBufferFloat(data, floats);
 	vector.resize(floats.size() / 2);
-	memcpy(&vector[0], &floats[0], sizeof(float)*floats.size());
+	memcpy(&vector[0], &floats[0], sizeof(float) * floats.size());
 	return data;
 }
 
@@ -500,8 +500,16 @@ char* fetchBufferVec4(char* data, std::vector<Vector4>& vector)
 	std::vector<float> floats;
 	data = fetchBufferFloat(data, floats);
 	vector.resize(floats.size() / 4);
-	memcpy(&vector[0], &floats[0], sizeof(float)*floats.size());
+	memcpy(&vector[0], &floats[0], sizeof(float) * floats.size());
 	return data;
+}
+
+bool readJSONBool(cJSON* obj, const char* name, bool default_value)
+{
+	cJSON* str_json = cJSON_GetObjectItemCaseSensitive((cJSON*)obj, name);
+	if (!str_json)
+		return default_value;
+	return str_json->type == cJSON_True;
 }
 
 float readJSONNumber(cJSON* obj, const char* name, float default_value)

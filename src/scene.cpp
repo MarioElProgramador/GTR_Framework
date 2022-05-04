@@ -9,7 +9,10 @@ GTR::Scene* GTR::Scene::instance = NULL;
 GTR::Scene::Scene()
 {
 	instance = this;
-	
+	multilight = false;
+	emissive = true;
+	occlussion = true;
+	normal = true;
 }
 
 void GTR::Scene::clear()
@@ -51,11 +54,10 @@ bool GTR::Scene::load(const char* filename)
 
 	//read global properties
 	background_color = readJSONVector3(json, "background_color", background_color);
-	ambient_light = readJSONVector3(json, "ambient_light", ambient_light );
+	ambient_light = readJSONVector3(json, "ambient_light", ambient_light);
 	main_camera.eye = readJSONVector3(json, "camera_position", main_camera.eye);
 	main_camera.center = readJSONVector3(json, "camera_target", main_camera.center);
 	main_camera.fov = readJSONNumber(json, "camera_fov", main_camera.fov);
-
 
 	//entities
 	cJSON* entities_json = cJSON_GetObjectItemCaseSensitive(json, "entities");
@@ -128,10 +130,9 @@ GTR::BaseEntity* GTR::Scene::createEntity(std::string type)
 {
 	if (type == "PREFAB")
 		return new GTR::PrefabEntity();
-	if (type == "LIGHT")
+	else if (type == "LIGHT")
 		return new GTR::LightEntity();
-
-    return NULL;
+	return NULL;
 }
 
 void GTR::BaseEntity::renderInMenu()
@@ -144,7 +145,8 @@ void GTR::BaseEntity::renderInMenu()
 #endif
 }
 
-	// PrefabEntity
+
+
 
 GTR::PrefabEntity::PrefabEntity()
 {
@@ -157,7 +159,7 @@ void GTR::PrefabEntity::configure(cJSON* json)
 	if (cJSON_GetObjectItem(json, "filename"))
 	{
 		filename = cJSON_GetObjectItem(json, "filename")->valuestring;
-		prefab = GTR::Prefab::Get( (std::string("data/") + filename).c_str());
+		prefab = GTR::Prefab::Get((std::string("data/") + filename).c_str());
 	}
 }
 
@@ -175,58 +177,61 @@ void GTR::PrefabEntity::renderInMenu()
 #endif
 }
 
-	// LightEntity
+GTR::LightEntity::LightEntity()
+{
+	entity_type = eEntityType::LIGHT;
+	color.set(1, 1, 1);
+	intensity = 1;
+	max_distance = 100;
+	cone_angle = 10;
+	cone_exp = 30;
+	area_size = 10;
+	target.set(0, 0, 0);
 
-	GTR::LightEntity::LightEntity()
-	{
-		entity_type = eEntityType::LIGHT;
-		color.set(1, 1, 1);
-		intensity = 1;
-		max_distance = 100;
-		cone_angle = 10;
-		cone_exp = 10;
-		area_size = 10;
-		target.set(0, 0, 0);
-		
-		/*shadow_bias = 0.0;
-		fbo = NULL;
-		shadowmap = NULL;
-		light_camera = NULL;*/
+	shadow_bias = 0.0001;
+	cast_shadows = false;
+
+	fbo = NULL;
+	shadowmap = NULL;
+	light_camera = NULL;
+}
+
+void GTR::LightEntity::configure(cJSON* json)
+{
+	color = readJSONVector3(json, "color", color);
+	intensity = readJSONNumber(json, "intensity", intensity);
+	max_distance = readJSONNumber(json, "max_dist", max_distance);
+	cone_angle = readJSONNumber(json, "cone_angle", cone_angle);
+	cone_exp = readJSONNumber(json, "cone_exp", cone_exp);
+	shadow_bias = readJSONNumber(json, "shadow_bias", shadow_bias);
+	area_size = readJSONNumber(json, "area_size", area_size);
+	target = readJSONVector3(json, "target", target);
+	cast_shadows = readJSONBool(json, "cast_shadows", false);
+	std::string str = readJSONString(json, "light_type", "");
+	if (str == "POINT")
+		light_type = eLightType::POINT;
+	else if (str == "SPOT")
+		light_type = eLightType::SPOT;
+	else if (str == "DIRECTIONAL")
+		light_type = eLightType::DIRECTIONAL;
+}
+
+void GTR::LightEntity::renderInMenu()
+{
+	GTR::BaseEntity::renderInMenu();
+	std::string type_str;
+	switch (light_type) {
+	case eLightType::POINT: type_str = "POINT"; break;
+	case eLightType::SPOT: type_str = "SPOT"; break;
+	case eLightType::DIRECTIONAL: type_str = "DIRECTIONAL"; break;
 	}
-
-	void GTR::LightEntity::configure(cJSON* json)
-	{
-		color = readJSONVector3(json, "color", color);
-		intensity = readJSONNumber(json, "intensity", intensity);
-		std::string light_type_str = readJSONString(json, "light_type", "");
-		if (light_type_str == "POINT") light_type = GTR::eLightType::POINT;
-		if (light_type_str == "SPOT") light_type = GTR::eLightType::SPOT;
-		if (light_type_str == "DIRECTIONAL") light_type = GTR::eLightType::DIRECTIONAL;
-		max_distance = readJSONNumber(json, "max_dist", max_distance);
-		cone_angle = readJSONNumber(json, "cone_angle", cone_angle);
-		cone_exp = readJSONNumber(json, "cone_exp", cone_exp);
-		area_size = readJSONNumber(json, "area_size", area_size);
-		target = readJSONVector3(json, "target", target);
-	}
-
-	void GTR::LightEntity::renderInMenu()
-	{
-		BaseEntity::renderInMenu();
-		std::string type_str;
-		switch (light_type)
-		{
-			case eLightType::POINT: type_str = "POINT"; break;
-			case eLightType::SPOT: type_str = "SPOT"; break;
-			case eLightType::DIRECTIONAL: type_str = "DIRECTIONAL"; break;
-		default: break;
-		}
-
-		// Debug
-		ImGui::Text("LightType: %s", type_str.c_str());
-		ImGui::ColorEdit3("Color", color.v);
-		ImGui::DragFloat("Intensity", &intensity);
-		ImGui::DragFloat("Max distance", &max_distance);
-		ImGui::DragFloat("Cone angle", &cone_angle);
-		ImGui::DragFloat("Cone exp", &cone_exp);
-	}
-
+	ImGui::Text("LightType: %s", type_str.c_str());
+	ImGui::ColorEdit3("Color", color.v);
+	ImGui::DragFloat("Intesity", &intensity, 0.1);
+	ImGui::DragFloat("Max distance", &max_distance, 1);
+	ImGui::DragFloat("Cone angle", &cone_angle, 0.1);
+	ImGui::DragFloat("Cone exp", &cone_exp, 0.1);
+	ImGui::DragFloat("Area size", &area_size, 0.1);
+	ImGui::DragFloat("Shadow bias", &shadow_bias, 0.001);
+	ImGui::Checkbox("Cast shadows", &cast_shadows);
+}
