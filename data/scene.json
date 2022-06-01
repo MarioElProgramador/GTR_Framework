@@ -1,7 +1,6 @@
 {
 	"background_color": [ 0.01, 0.01, 0.1 ],
 	"ambient_light": [ 0.1, 0.1, 0.2 ],
-	"environment": "night.hdre",
 	"camera_position": [ -300, 90, -150 ],
 	"camera_target": [ 0, 40, 0 ],
 	"camera_fov": 60,
@@ -11,6 +10,20 @@
 			"type": "PREFAB",
 			"filename": "prefabs/floor.glb",
 			"position": [ 0, 1, 0 ]
+		},
+		{
+			"name": "floor2",
+			"type": "PREFAB",
+			"filename": "prefabs/road/road.gltf",
+			"position": [ 0, 0, 300 ],
+			"scale": [ 10, 10, 10 ]
+		},
+		{
+			"name": "floor3",
+			"type": "PREFAB",
+			"filename": "prefabs/road/road.gltf",
+			"position": [ 0, 0, -300 ],
+			"scale": [ 10, 10, 10 ]
 		},
 		{
 			"name": "car1",

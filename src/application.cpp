@@ -66,7 +66,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	//prefab = GTR::Prefab::Get("data/prefabs/gmc/scene.gltf");
 
 	scene = new GTR::Scene();
-	if (!scene->load("data/scene.json"))
+	if (!scene->load("data/scene_improved.json"))
 		exit(1);
 
 	camera->lookAt(scene->main_camera.eye, scene->main_camera.center, Vector3(0, 1, 0));
@@ -105,8 +105,8 @@ void Application::render(void)
 	renderer->renderScene(scene, camera);
 
 	//Draw the floor grid, helpful to have a reference point
-	if(render_debug)
-		//drawGrid(); // Desactivada por que se solapa
+	//if(render_debug)
+		//drawGrid(); // No me termina de convencer la grid
 
     glDisable(GL_DEPTH_TEST);
     //render anything in the gui after this
@@ -246,6 +246,16 @@ void Application::renderDebugGUI(void)
 	ImGui::Checkbox("Wireframe", &render_wireframe);
 	ImGui::ColorEdit3("BG color", scene->background_color.v);
 	ImGui::ColorEdit3("Ambient Light", scene->ambient_light.v);
+	ImGui::Combo("Light rendering", (int*)&renderer->lightRender, "Singlepass\0Multipass", 2);
+	ImGui::Checkbox("Emissive texture", &scene->emissive);
+	ImGui::Checkbox("Occlussion texture", &scene->occlussion);
+	ImGui::Checkbox("Normal texture", &scene->normal);
+	ImGui::Combo("Pipeline", (int*)&renderer->pipeline, "Forward\0Deferred", 2);
+	ImGui::Combo("Render Shape", (int*)&renderer->renderShape, "Quads\0Geometry", 2);
+	ImGui::Checkbox("Show GBuffers", &renderer->show_gbuffers);
+	ImGui::Checkbox("Show SSAO", &renderer->show_ssao);
+	ImGui::Combo("Pipeline space", (int*)&renderer->pipelineSpace, "Linear\0Gamma", 2);
+	ImGui::Combo("Dynamic range", (int*)&renderer->dynamicRange, "SDR\0HDR", 2);
 
 	//add info to the debug panel about the camera
 	if (ImGui::TreeNode(camera, "Camera")) {
@@ -286,8 +296,13 @@ void Application::onKeyDown( SDL_KeyboardEvent event )
 	switch(event.keysym.sym)
 	{
 		case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
-		case SDLK_F1: render_debug = !render_debug; break;
-		case SDLK_f: camera->center.set(0, 0, 0); camera->updateViewMatrix(); break;
+		case SDLK_F1: render_debug = !render_debug; break; // Debug / No debug
+		case SDLK_f: camera->center.set(0, 0, 0); camera->updateViewMatrix(); break; // Center
+		case SDLK_p: renderer->pipeline = (renderer->pipeline == GTR::Renderer::FORWARD ? GTR::Renderer::DEFERRED : GTR::Renderer::FORWARD); break; // Forward / Deferred
+		case SDLK_g: renderer->renderShape = (renderer->renderShape == GTR::Renderer::QUAD ? GTR::Renderer::GEOMETRY : GTR::Renderer::QUAD); break; // Quad / Geometry
+		case SDLK_j: renderer->pipelineSpace = (renderer->pipelineSpace == GTR::Renderer::LINEAR ? GTR::Renderer::GAMMA : GTR::Renderer::LINEAR); break; // Linear / Gamma
+		case SDLK_h: renderer->dynamicRange = (renderer->dynamicRange == GTR::Renderer::SDR ? GTR::Renderer::HDR : GTR::Renderer::SDR); break; // SDR / HDR
+		case SDLK_l: renderer->lightRender = (renderer->lightRender == GTR::Renderer::eLightRender::MULTIPASS ? GTR::Renderer::eLightRender::SINGLEPASS : GTR::Renderer::eLightRender::MULTIPASS); break; // Multipass / Singlepass
 		case SDLK_F5: Shader::ReloadAll(); break;
 		case SDLK_F6:
 			scene->clear();

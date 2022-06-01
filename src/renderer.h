@@ -3,6 +3,9 @@
 
 //forward declarations
 class Camera;
+class Shader;
+
+using namespace std;
 
 namespace GTR {
 
@@ -12,6 +15,7 @@ namespace GTR {
 	// Clase para recoger información del prefab referente al render
 	class RenderCall {
 	public:
+
 		Material* material;
 		Mesh* mesh;
 		BoundingBox world_bounding;
@@ -38,13 +42,55 @@ namespace GTR {
 	// Separating the render from anything else makes the code cleaner
 	class Renderer
 	{
+		bool render_shadowmap;
 
 	public:
+
+		enum eLightRender {
+			SINGLEPASS,
+			MULTIPASS
+		};
+
+		enum ePipeline {
+			FORWARD,
+			DEFERRED
+		};
+		enum eRenderShape {
+			QUAD,
+			GEOMETRY
+		};
+		enum ePipelineSpace {
+			LINEAR = 0,
+			GAMMA = 1
+		};
+		enum eDynamicRange {
+			SDR = 0,
+			HDR = 1
+		};
+
 
 		std::vector<GTR::LightEntity*> lights;
 		std::vector<RenderCall> render_calls;
 
+		eLightRender lightRender;
+		ePipeline pipeline;
+		eRenderShape renderShape;
+		ePipelineSpace pipelineSpace;
+		eDynamicRange dynamicRange;
+		FBO* gbuffers_fbo;
+		FBO* illumination_fbo;
+
+		FBO* ssao_fbo;
+		Texture* ssao_blur;
+		bool show_gbuffers;
+		bool show_ssao;
+
+		vector<Vector3> random_points;
+
+		Renderer();
 		//add here your functions
+		void renderForward(Camera* camera, GTR::Scene* scene);
+		void renderDeferred(Camera* camera, GTR::Scene* scene);
 
 		//renders several elements of the scene
 		void renderScene(GTR::Scene* scene, Camera* camera);
@@ -56,12 +102,21 @@ namespace GTR {
 		void renderNode(const Matrix44& model, GTR::Node* node, Camera* camera);
 
 		//to render one mesh given its material and transformation matrix
-		void renderMeshWithMaterial(const Matrix44 model, Mesh* mesh, GTR::Material* material, Camera* camera);
+		void renderMeshWithMaterialToGBuffers(const Matrix44 model, Mesh* mesh, GTR::Material* material, Camera* camera);
+		void renderMeshWithMaterialAndLighting(const Matrix44 model, Mesh* mesh, GTR::Material* material, Camera* camera);
+
+		void uploadLightToShaderMultipass(LightEntity* light, Shader* shader);
+		void uploadLightToShaderSinglepass(Shader* shader);
+		void uploadLightToShaderDeferred(Shader* shader, Matrix44 inv_vp, int width, int height, Camera* camera);
 
 		void generateShadowmap(LightEntity* light);
 		void renderFlatMesh(const Matrix44 model, Mesh* mesh, GTR::Material* material, Camera* camera);
 		void showShadowmap(LightEntity* light);
+	
+		void uploadUniformsAndTextures(Shader* shader, GTR::Material* material, Camera* camera, const Matrix44 model);
 	};
+
+	vector<Vector3> generateSpherePoints(int num, float radius, bool hemi);
 
 	Texture* CubemapFromHDRE(const char* filename);
 };

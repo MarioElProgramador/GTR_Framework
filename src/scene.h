@@ -13,8 +13,6 @@ class Texture;
 
 //our namespace
 namespace GTR {
-
-	// Tipos de entidad
 	enum eEntityType {
 		NONE = 0,
 		PREFAB = 1,
@@ -24,7 +22,6 @@ namespace GTR {
 		DECALL = 5
 	};
 
-	// Tipos de luz
 	enum eLightType {
 		POINT = 0,
 		SPOT = 1,
@@ -43,7 +40,6 @@ namespace GTR {
 		eEntityType entity_type;
 		Matrix44 model;
 		bool visible;
-
 		BaseEntity() { entity_type = NONE; visible = true; }
 		virtual ~BaseEntity() {}
 		virtual void renderInMenu();
@@ -74,12 +70,12 @@ namespace GTR {
 		float cone_exp;
 		float area_size;
 		Vector3 target;
-
 		bool cast_shadows;
 		float shadow_bias;
 
 		FBO* fbo;
 		Texture* shadowmap;
+
 		Camera* light_camera;
 
 		LightEntity();
@@ -116,4 +112,4 @@ namespace GTR {
 
 };
 
-#endif#endif
+#endif

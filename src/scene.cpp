@@ -183,17 +183,36 @@ GTR::LightEntity::LightEntity()
 	color.set(1, 1, 1);
 	intensity = 1;
 	max_distance = 100;
-	cone_angle = 10;
-	cone_exp = 30;
-	area_size = 10;
+	cone_angle = 0;
+	cone_exp = 0;
+	area_size = 0;
 	target.set(0, 0, 0);
-
-	shadow_bias = 0.0001;
+	shadow_bias = 0.01;
 	cast_shadows = false;
 
 	fbo = NULL;
 	shadowmap = NULL;
 	light_camera = NULL;
+}
+
+void GTR::LightEntity::renderInMenu()
+{
+	GTR::BaseEntity::renderInMenu();
+	std::string type_str;
+	switch (light_type) {
+	case eLightType::POINT: type_str = "POINT"; break;
+	case eLightType::SPOT: type_str = "SPOT"; break;
+	case eLightType::DIRECTIONAL: type_str = "DIRECTIONAL"; break;
+	}
+	ImGui::Text("LightType: %s", type_str.c_str());
+	ImGui::ColorEdit3("Color", color.v);
+	ImGui::DragFloat("Intesity", &intensity, 0.1);
+	ImGui::DragFloat("Max distance", &max_distance, 1);
+	ImGui::DragFloat("Cone angle", &cone_angle, 0.1);
+	ImGui::DragFloat("Cone exp", &cone_exp, 0.1);
+	ImGui::DragFloat("Shadow bias", &shadow_bias, 0.01);
+	ImGui::Checkbox("Cast shadows", &cast_shadows);
+
 }
 
 void GTR::LightEntity::configure(cJSON* json)
@@ -214,24 +233,4 @@ void GTR::LightEntity::configure(cJSON* json)
 		light_type = eLightType::SPOT;
 	else if (str == "DIRECTIONAL")
 		light_type = eLightType::DIRECTIONAL;
-}
-
-void GTR::LightEntity::renderInMenu()
-{
-	GTR::BaseEntity::renderInMenu();
-	std::string type_str;
-	switch (light_type) {
-	case eLightType::POINT: type_str = "POINT"; break;
-	case eLightType::SPOT: type_str = "SPOT"; break;
-	case eLightType::DIRECTIONAL: type_str = "DIRECTIONAL"; break;
-	}
-	ImGui::Text("LightType: %s", type_str.c_str());
-	ImGui::ColorEdit3("Color", color.v);
-	ImGui::DragFloat("Intesity", &intensity, 0.1);
-	ImGui::DragFloat("Max distance", &max_distance, 1);
-	ImGui::DragFloat("Cone angle", &cone_angle, 0.1);
-	ImGui::DragFloat("Cone exp", &cone_exp, 0.1);
-	ImGui::DragFloat("Area size", &area_size, 0.1);
-	ImGui::DragFloat("Shadow bias", &shadow_bias, 0.001);
-	ImGui::Checkbox("Cast shadows", &cast_shadows);
 }
