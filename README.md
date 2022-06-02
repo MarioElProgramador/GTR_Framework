@@ -11,10 +11,15 @@ It imports GLTF and PNGs.
 You can use some keys to interact with the scene without use the debug:
 
 > F: center the camera
+
 > P: Pipeline (Forward / Deferred)
+
 > G: Geometry / Quads
+
 > J: Gamma / Linear
+
 > H: SDR / HDR
+
 > L: MultiLight / SingleLight
 
 ## Compile
