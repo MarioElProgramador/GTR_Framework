@@ -1,10 +1,26 @@
-Mario Valenzuela Pinazo 217326
+Mario Valenzuela Pinazo 217326 - u161649
+>
 mario.valenzuela01@estudiant.upf.edu
 
 # GTR_Framework
 OpenGL C++ Framework used for the Grafics a Temps Real course at Universitat Pompeu Fabra.
 
 It imports GLTF and PNGs.
+
+## Functionaility
+You can use some keys to interact with the scene without use the debug:
+
+> F: center the camera
+
+> P: Pipeline (Forward / Deferred)
+
+> G: Geometry / Quads
+
+> J: Gamma / Linear
+
+> H: SDR / HDR
+
+> L: MultiLight / SingleLight
 
 ## Compile
 
