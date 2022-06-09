@@ -36,6 +36,21 @@ namespace GTR {
 				else
 					return (distance_to_camera > str.distance_to_camera);
 		}
+
+		//the struct that holds one probe coeffs
+		//already defined in "sphericalharmonics.h"
+		struct SphericalHarmonics {
+			Vector3 coeffs[9];
+		};
+
+		//struct to store probes
+		struct sProbe {
+			Vector3 pos; //where is located
+			Vector3 local; //its ijk pos in the matrix
+			int index; //its index in the linear array
+			SphericalHarmonics sh; //coeffs
+		};
+
 	};
 
 	// This class is in charge of rendering anything in our system.
@@ -84,6 +99,8 @@ namespace GTR {
 		Texture* ssao_blur;
 		bool show_gbuffers;
 		bool show_ssao;
+
+		sProbe probe;
 
 		vector<Vector3> random_points;
 

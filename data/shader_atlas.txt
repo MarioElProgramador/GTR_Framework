@@ -52,7 +52,7 @@ vec3 perturbNormal(vec3 N, vec3 WP, vec2 uv, vec3 normal_pixel)
 /*
 float bilinear( 
    const float &tx, 
-   const float  &ty, 
+   const float &ty, 
    const Vec3f &c00, 
    const Vec3f &c10, 
    const Vec3f &c01, 
