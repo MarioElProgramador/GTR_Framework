@@ -14,6 +14,12 @@ depth quad.vs depth.fs
 ssao quad.vs ssao.fs
 ssao_blur basic.vs ssao_blur.fs
 
+tonemapper quad.vs tonemapper.fs
+probe basic.vs probe.fs
+skybox basic.vs skybox.fs
+irradiance quad.vs irradiance.fs
+reflection_probe basic.vs reflection_probe.fs
+
 multi basic.vs multi.fs
 
 // -------------------------------------------------------------------------------
@@ -47,7 +53,7 @@ vec3 perturbNormal(vec3 N, vec3 WP, vec2 uv, vec3 normal_pixel)
 	return normalize(TBN * normal_pixel);
 }
 
-// Testear
+// TESTEAR
 // para los picos de las sombras
 /*
 float bilinear( 
@@ -221,6 +227,88 @@ float Fd_Burley (const in float NoV, const in float NoL, const in float LoH, con
     float viewScatter  = F_Schlick(NoV, 1.0, f90);
     return lightScatter * viewScatter * RECIPROCAL_PI;
 }
+
+// -------------------------------------------------------------------------------
+\linear_gamma
+
+vec3 degamma(vec3 c)
+{
+	return pow(c, vec3(2.2));
+}
+
+vec3 gamma(vec3 c)
+{
+	return pow(c, vec3(1.0/2.2));
+}
+
+// -------------------------------------------------------------------------------
+\SHformulas_irr
+
+const float Pi = 3.141592654;
+const float CosineA0 = Pi;
+const float CosineA1 = (2.0 * Pi) / 3.0;
+const float CosineA2 = Pi * 0.25;
+struct SH9 { float c[9]; }; //to store weights
+struct SH9Color { vec3 c[9]; }; //to store colors
+
+uniform vec3 u_irr_start;
+uniform vec3 u_irr_end;
+uniform vec3 u_irr_dim;
+uniform float u_irr_normal_distance;
+uniform float u_num_probes;
+uniform vec3 u_irr_delta;
+uniform sampler2D u_irr_texture;
+
+void SHCosineLobe(in vec3 dir, out SH9 sh) //SH9
+{
+	// Band 0
+	sh.c[0] = 0.282095 * CosineA0;
+	// Band 1
+	sh.c[1] = 0.488603 * dir.y * CosineA1; 
+	sh.c[2] = 0.488603 * dir.z * CosineA1;
+	sh.c[3] = 0.488603 * dir.x * CosineA1;
+	// Band 2
+	sh.c[4] = 1.092548 * dir.x * dir.y * CosineA2;
+	sh.c[5] = 1.092548 * dir.y * dir.z * CosineA2;
+	sh.c[6] = 0.315392 * (3.0 * dir.z * dir.z - 1.0) * CosineA2;
+	sh.c[7] = 1.092548 * dir.x * dir.z * CosineA2;
+	sh.c[8] = 0.546274 * (dir.x * dir.x - dir.y * dir.y) * CosineA2;
+}
+
+vec3 ComputeSHIrradiance(in vec3 normal, in SH9Color sh)
+{
+	// Compute the cosine lobe in SH, oriented about the normal direction
+	SH9 shCosine;
+	SHCosineLobe(normal, shCosine);
+	// Compute the SH dot product to get irradiance
+	vec3 irradiance = vec3(0.0);
+	for(int i = 0; i < 9; ++i)
+		irradiance += sh.c[i] * shCosine.c[i];
+
+	return irradiance;
+}
+
+vec3 computeIrr(vec3 local_indices, vec3 N){
+	// Compute in which row is the probe stored
+	float row = local_indices.x + local_indices.y * u_irr_dim.x + local_indices.z * u_irr_dim.x * u_irr_dim.y;
+	
+	// Find the UV.y coord of that row in the probes texture
+	float row_uv = (row + 1.0) / (u_num_probes + 1.0);
+
+	SH9Color sh;
+
+	// Fill the coefficients
+	const float d_uvx = 1.0 / 9.0;
+	for(int i = 0; i < 9; i++) {
+		vec2 coeffs_uv = vec2((float(i)+0.5) * d_uvx, row_uv);
+		sh.c[i] = texture(u_irr_texture, coeffs_uv).xyz;
+	}
+
+	// Now we can use the coefficients to compute the irradiance
+	vec3 irradiance = ComputeSHIrradiance(N, sh);
+	return irradiance;
+}
+
 
 // -------------------------------------------------------------------------------
 \basic.vs
@@ -674,7 +762,7 @@ void main() {
 	if(gamma_mode == 1) color.xyz = pow(color.xyz,vec3(1.0/2.2)); //Linear space
 	
 	vec3 rgb;
-	if(dynamic_range == 1){//HDR
+	if(dynamic_range == 1){ // HDR
 		float u_scale = 4;
 		float u_average_lum = 1;
 		float u_lumwhite2 = 100;
@@ -1023,6 +1111,94 @@ void main() {
     }
     FragColor = result/(4.0*4.0);
 }  
+
+// --------------------------------------TONEMAPPER--------------------------------------
+\tonemapper.fs
+
+#version 330 core
+
+in vec2 v_uv;
+
+uniform sampler2D u_texture;
+uniform float u_average_lum; 
+uniform float u_lumwhite2; 
+uniform float u_scale; 
+
+out vec4 FragColor;
+
+#include "linear_gamma"
+
+void main() {
+	vec4 color = texture2D(u_texture, v_uv);
+	vec3 rgb = color.xyz;
+
+	float lum = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+	float L = (u_scale / u_average_lum) * lum;
+	float Ld = (L * (1.0 + L / u_lumwhite2)) / (1.0 + L);
+
+	rgb = (rgb / lum) * Ld;
+	rgb = max(rgb,vec3(0.001));
+	rgb = gamma(rgb);
+	FragColor = vec4(rgb, color.a);
+}
+
+// --------------------------------------PROBE--------------------------------------
+\probe.fs
+
+#version 330 core
+
+in vec3 v_position;
+in vec3 v_world_position;
+in vec3 v_normal;
+in vec2 v_uv;
+in vec4 v_color;
+
+uniform vec3 u_coeffs[9];
+
+out vec4 FragColor;
+
+#include "SHformulas_irr"
+
+void main()
+{
+	SH9Color sh;
+	sh.c[0] = u_coeffs[0];
+	sh.c[1] = u_coeffs[1];
+	sh.c[2] = u_coeffs[2];
+	sh.c[3] = u_coeffs[3];
+	sh.c[4] = u_coeffs[4];
+	sh.c[5] = u_coeffs[5];
+	sh.c[6] = u_coeffs[6];
+	sh.c[7] = u_coeffs[7];
+	sh.c[8] = u_coeffs[8];
+
+	vec3 N = normalize(v_normal);
+	vec3 irradiance = ComputeSHIrradiance(N, sh);
+
+	FragColor = vec4(irradiance, 1.0);
+}
+
+// --------------------------------------SKYBOX--------------------------------------
+\skybox.fs
+
+#version 330 core
+
+in vec3 v_world_position;
+
+uniform samplerCube u_texture;
+uniform vec3 u_camera_position;
+
+out vec4 FragColor;
+
+void main()
+{
+	vec3 V = normalize( u_camera_position - v_world_position );
+
+	FragColor = texture( u_texture, V );
+}
+
+// --------------------------------------IRRADIANCE--------------------------------------
+
 
 // -------------------------------------------------------------------------------
 \multi.fs

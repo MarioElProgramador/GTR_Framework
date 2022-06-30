@@ -41,6 +41,14 @@
 			"angle": 200
 		},
 		{
+			"name": "sign",
+			"type": "PREFAB",
+			"filename": "prefabs/sign.glb",
+			"position": [ 118, 48, -400 ],
+			"angle": 120,
+			"scale": [ 60, 60, 60 ]
+		},
+		{
 			"name": "house",
 			"type": "PREFAB",
 			"filename": "prefabs/house_test/scene.gltf",

@@ -1,11 +1,20 @@
 #pragma once
 #include "prefab.h"
+#include "sphericalharmonics.h"
 
 //forward declarations
 class Camera;
 class Shader;
 
 using namespace std;
+
+//struct to store probes
+struct sProbe {
+	Vector3 pos; //where is located
+	Vector3 local; //its ijk pos in the matrix
+	int index; //its index in the linear array
+	SphericalHarmonics sh; //coeffs
+};
 
 namespace GTR {
 
@@ -36,20 +45,6 @@ namespace GTR {
 				else
 					return (distance_to_camera > str.distance_to_camera);
 		}
-
-		//the struct that holds one probe coeffs
-		//already defined in "sphericalharmonics.h"
-		struct SphericalHarmonics {
-			Vector3 coeffs[9];
-		};
-
-		//struct to store probes
-		struct sProbe {
-			Vector3 pos; //where is located
-			Vector3 local; //its ijk pos in the matrix
-			int index; //its index in the linear array
-			SphericalHarmonics sh; //coeffs
-		};
 
 	};
 
@@ -82,7 +77,6 @@ namespace GTR {
 			SDR = 0,
 			HDR = 1
 		};
-
 
 		std::vector<GTR::LightEntity*> lights;
 		std::vector<RenderCall> render_calls;

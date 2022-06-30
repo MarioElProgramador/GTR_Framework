@@ -246,16 +246,16 @@ void Application::renderDebugGUI(void)
 	ImGui::Checkbox("Wireframe", &render_wireframe);
 	ImGui::ColorEdit3("BG color", scene->background_color.v);
 	ImGui::ColorEdit3("Ambient Light", scene->ambient_light.v);
-	ImGui::Combo("Light rendering", (int*)&renderer->lightRender, "Singlepass\0Multipass", 2);
+	ImGui::Combo("Light rendering [L]", (int*)&renderer->lightRender, "Singlepass\0Multipass", 2);
 	ImGui::Checkbox("Emissive texture", &scene->emissive);
 	ImGui::Checkbox("Occlussion texture", &scene->occlussion);
 	ImGui::Checkbox("Normal texture", &scene->normal);
-	ImGui::Combo("Pipeline", (int*)&renderer->pipeline, "Forward\0Deferred", 2);
-	ImGui::Combo("Render Shape", (int*)&renderer->renderShape, "Quads\0Geometry", 2);
+	ImGui::Combo("Pipeline [P]", (int*)&renderer->pipeline, "Forward\0Deferred", 2);
+	ImGui::Combo("Render Shape [G]", (int*)&renderer->renderShape, "Quads\0Geometry", 2);
 	ImGui::Checkbox("Show GBuffers", &renderer->show_gbuffers);
 	ImGui::Checkbox("Show SSAO", &renderer->show_ssao);
-	ImGui::Combo("Pipeline space", (int*)&renderer->pipelineSpace, "Linear\0Gamma", 2);
-	ImGui::Combo("Dynamic range", (int*)&renderer->dynamicRange, "SDR\0HDR", 2);
+	ImGui::Combo("Pipeline space [J]", (int*)&renderer->pipelineSpace, "Linear\0Gamma", 2);
+	ImGui::Combo("Dynamic range [H]", (int*)&renderer->dynamicRange, "SDR\0HDR", 2);
 
 	//add info to the debug panel about the camera
 	if (ImGui::TreeNode(camera, "Camera")) {

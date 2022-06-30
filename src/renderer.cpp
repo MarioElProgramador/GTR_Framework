@@ -106,7 +106,7 @@ void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
 	}
 
 	Mesh* quad = Mesh::getQuad();
-	Mesh* sphere = Mesh::Get("data/meshes/sphere.obj", false, false);
+	Mesh* sphere = Mesh::Get("data/meshes/sphere.obj", false);
 	Matrix44 inv_vp = camera->viewprojection_matrix;
 	inv_vp.inverse();
 
