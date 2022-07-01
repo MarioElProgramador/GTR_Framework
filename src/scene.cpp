@@ -132,6 +132,8 @@ GTR::BaseEntity* GTR::Scene::createEntity(std::string type)
 		return new GTR::PrefabEntity();
 	else if (type == "LIGHT")
 		return new GTR::LightEntity();
+	else if (type == "DECAL")
+		return new GTR::DecalEntity();
 	return NULL;
 }
 
@@ -144,9 +146,6 @@ void GTR::BaseEntity::renderInMenu()
 	ImGuiMatrix44(model, "Model");
 #endif
 }
-
-
-
 
 GTR::PrefabEntity::PrefabEntity()
 {
@@ -233,4 +232,31 @@ void GTR::LightEntity::configure(cJSON* json)
 		light_type = eLightType::SPOT;
 	else if (str == "DIRECTIONAL")
 		light_type = eLightType::DIRECTIONAL;
+}
+
+GTR::DecalEntity::DecalEntity() {
+	entity_type = eEntityType::DECALL;
+}
+
+void GTR::DecalEntity::renderInMenu() {
+
+}
+
+void GTR::DecalEntity::configure(cJSON* json) {
+	if (cJSON_GetObjectItem(json, "texture"))
+	{
+		texture = cJSON_GetObjectItem(json, "texture")->valuestring;
+	}
+}
+
+GTR::ReflectionProbeEntity::ReflectionProbeEntity() {
+	entity_type = eEntityType::REFLECTION_PROBE;
+	texture = NULL;
+}
+
+void GTR::ReflectionProbeEntity::renderInMenu() {
+
+}
+
+void GTR::ReflectionProbeEntity::configure(cJSON* json) {
 }

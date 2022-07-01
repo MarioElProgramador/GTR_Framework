@@ -41,6 +41,20 @@
 			"angle": 200
 		},
 		{
+			"name": "itsme",
+			"type": "DECAL",
+			"position": [ 0, 0, 0 ],
+			"scale": [ 80, 30, 80 ],
+			"texture": "data/textures/MarioVP.png"
+		},
+		{
+			"name": "mario",
+			"type": "DECAL",
+			"position": [ 0, 0, 0 ],
+			"scale": [ 80, 30, 80 ],
+			"texture": "data/textures/Mario.png"
+		},
+		{
 			"name": "sign",
 			"type": "PREFAB",
 			"filename": "prefabs/sign.glb",

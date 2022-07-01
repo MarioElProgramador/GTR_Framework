@@ -1,1 +1,127 @@
-﻿  visualstudio.vcxproj -> C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\framework.exe
+﻿  application.cpp
+  gltf_loader.cpp
+  prefab.cpp
+  renderer.cpp
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(771,15): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1006,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1010,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1005,3): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1415,3): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1420,3): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1965,2): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(1975,2): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cgltf.h(2054,2): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(104,1): warning C4099: 'cJSON': nombre de tipo visto anteriormente usando 'class' ahora se ve usando 'struct' (compilando archivo de origen ..\..\src\prefab.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(103): message : vea la declaración de 'cJSON' (compilando archivo de origen ..\..\src\prefab.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(41,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(55,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(63,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(79,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(108,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(138,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(172,22): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.h(9,12): warning C4099: 'cJSON': nombre de tipo visto anteriormente usando 'struct' ahora se ve usando 'class' (compilando archivo de origen ..\..\src\application.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(103): message : vea la declaración de 'cJSON' (compilando archivo de origen ..\..\src\application.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\prefab.cpp(245,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(119,14): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(120,20): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(136,55): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(138,55): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(104,1): warning C4099: 'cJSON': nombre de tipo visto anteriormente usando 'class' ahora se ve usando 'struct' (compilando archivo de origen ..\..\src\renderer.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(103): message : vea la declaración de 'cJSON' (compilando archivo de origen ..\..\src\renderer.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(269,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(367,36): warning C4244: '*=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\application.cpp(369,35): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(42,15): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(43,13): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(44,11): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(141,68): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(141,48): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(254,51): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(254,37): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(254,24): warning C4244: 'argumento': conversión de 'double' a 'GLint'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(256,61): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(256,47): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(256,34): warning C4244: 'argumento': conversión de 'double' a 'GLint'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(256,20): warning C4244: 'argumento': conversión de 'double' a 'GLint'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(258,40): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(258,26): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(260,50): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(260,36): warning C4244: 'argumento': conversión de 'double' a 'GLsizei'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(260,20): warning C4244: 'argumento': conversión de 'double' a 'GLint'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(281,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(304,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(104,1): warning C4099: 'cJSON': nombre de tipo visto anteriormente usando 'class' ahora se ve usando 'struct' (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(103): message : vea la declaración de 'cJSON' (compilando archivo de origen ..\..\src\gltf_loader.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(354,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(61,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(616,87): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(71,13): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(627,117): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(646,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(114,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(710,32): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(141,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(753,63): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(753,43): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\renderer.cpp(776,10): warning C4244: 'inicializando': conversión de 'long' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(163,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(183,21): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(404,22): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(433,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(479,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(484,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\gltf_loader.cpp(501,22): warning C4018: '<': no coinciden signed/unsigned
+  scene.cpp
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(104,1): warning C4099: 'cJSON': nombre de tipo visto anteriormente usando 'class' ahora se ve usando 'struct' (compilando archivo de origen ..\..\src\scene.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\extra\cJSON.h(103): message : vea la declaración de 'cJSON' (compilando archivo de origen ..\..\src\scene.cpp)
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(20,20): warning C4018: '<': no coinciden signed/unsigned
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(94,16): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(95,28): warning C4244: 'argumento': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(189,20): warning C4305: '=': truncamiento de 'double' a 'float'
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(208,46): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(210,49): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(211,45): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\src\scene.cpp(212,52): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+     Creando biblioteca ..\..\framework.lib y objeto ..\..\framework.exp
+LINK : warning LNK4098: la biblioteca predeterminada'LIBCMT' entra en conflicto con otras bibliotecas; use la biblioteca /NODEFAULTLIB:biblioteca
+  Generando código
+  15 of 4639 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    7 functions were new in current compilation
+    60 functions had inline decision re-evaluated but remain unchanged
+  Generación de código finalizada
+LINK : warning LNK4286: "___glewDeleteBuffers" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewLinkProgram" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewDeleteShader" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGenBuffers" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGetProgramInfoLog" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewDetachShader" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewUniformMatrix4fv" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBlendEquationSeparate" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGenVertexArrays" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBlendEquation" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewShaderSource" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewDeleteProgram" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewActiveTexture" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewAttachShader" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBufferData" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGetUniformLocation" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBlendFuncSeparate" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewDeleteVertexArrays" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGetProgramiv" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGetShaderInfoLog" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewUniform1i" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewCreateProgram" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBindBuffer" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewCreateShader" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGetAttribLocation" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewCompileShader" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewGetShaderiv" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewDrawElementsBaseVertex" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewVertexAttribPointer" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewUseProgram" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBindSampler" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewBindVertexArray" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+LINK : warning LNK4286: "___glewEnableVertexAttribArray" importa el símbolo "glew32s.lib(glew.obj)" definido en "imgui_impl_opengl3.obj"
+glew32s.lib(glew.obj) : warning LNK4099: no se encontró PDB 'vc120.pdb' con 'glew32s.lib(glew.obj)' o en 'C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\vc120.pdb'; se vinculará el objeto sin tener en cuenta información de depuración
+  visualstudio.vcxproj -> C:\Users\Propietario\OneDrive\Escritorio\GTR_Framework\framework.exe

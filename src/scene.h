@@ -83,6 +83,26 @@ namespace GTR {
 		virtual void configure(cJSON* json);
 	};
 
+	class DecalEntity : public GTR::BaseEntity
+	{
+	public:
+		std::string texture;
+
+		DecalEntity();
+		virtual void renderInMenu();
+		virtual void configure(cJSON* json);
+	};
+
+	class ReflectionProbeEntity : public GTR::BaseEntity
+	{
+	public:
+		Texture* texture;
+
+		ReflectionProbeEntity();
+		virtual void renderInMenu();
+		virtual void configure(cJSON* json);
+	};
+
 	//contains all entities of the scene
 	class Scene
 	{

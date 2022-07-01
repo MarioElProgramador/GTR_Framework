@@ -20,6 +20,8 @@ skybox basic.vs skybox.fs
 irradiance quad.vs irradiance.fs
 reflection_probe basic.vs reflection_probe.fs
 
+decal basic.vs decal.fs
+
 multi basic.vs multi.fs
 
 // -------------------------------------------------------------------------------
@@ -737,6 +739,10 @@ uniform float u_light_exp;
 uniform int gamma_mode;
 uniform int dynamic_range;
 
+uniform int is_reflection;
+uniform vec3 u_camera_position;
+uniform samplerCube u_reflection_texture;
+
 out vec4 FragColor;
 
 const int MAX_LIGHTS = 5;
@@ -760,26 +766,6 @@ void main() {
 
 	vec4 color = vec4(gb0_color.xyz, 1.0);
 	if(gamma_mode == 1) color.xyz = pow(color.xyz,vec3(1.0/2.2)); //Linear space
-	
-	vec3 rgb;
-	if(dynamic_range == 1){ // HDR
-		float u_scale = 4;
-		float u_average_lum = 1;
-		float u_lumwhite2 = 100;
-		float u_igamma = 2.2;
-
-		rgb = color.xyz;
-
-		float lum = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
-		float Lu = (u_scale / u_average_lum) * lum;
-		float Ld = (Lu * (1.0 + Lu / u_lumwhite2)) / (1.0 + Lu);
-
-		rgb = (rgb / lum) * Ld;
-		rgb = max(rgb, vec3(0.001));
-		rgb = pow(rgb, vec3(u_igamma));
-
-		color = vec4( rgb, color.a );
-	}
 	
 	float ssao_factor = texture( u_ssao_texture, uv ).x;
 	ssao_factor = pow(ssao_factor, 3.0);
@@ -1198,6 +1184,65 @@ void main()
 }
 
 // --------------------------------------IRRADIANCE--------------------------------------
+
+
+// --------------------------------------PROBE_REFLECTION--------------------------------------
+\reflection_probe.fs
+
+#version 330 core
+
+in vec3 v_world_position;
+in vec3 v_normal;
+uniform samplerCube u_texture;
+uniform vec3 u_camera_position;
+
+out vec4 FragColor;
+
+void main()
+{
+    vec3 V = v_world_position - u_camera_position;
+	vec3 N = normalize(v_normal);
+	vec3 R = reflect(V, N);
+	FragColor = textureLod(u_texture, R, 5.0);
+}
+
+
+// --------------------------------------DECAL--------------------------------------
+\decal.fs
+
+#version 330 core
+
+uniform mat4 u_inverse_viewprojection;
+uniform mat4 u_imodel;
+uniform vec2 u_iRes;
+
+uniform sampler2D u_depth_texture;
+uniform sampler2D u_decal_texture;
+
+out vec4 FragColor;
+
+void main()
+{
+	vec2 uv = gl_FragCoord.xy * u_iRes.xy;
+	
+	float depth = texture(u_depth_texture, uv).x;
+
+	vec4 screen_pos = vec4(uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
+	vec4 proj_worldpos = u_inverse_viewprojection * screen_pos;
+	vec3 world_position = proj_worldpos.xyz / proj_worldpos.w;
+
+	vec3 localpos = (u_imodel * vec4(world_position,1.0)).xyz;
+
+	//if outside of the volume
+	if(localpos.x < -0.5 || localpos.x > 0.5 || localpos.y < -0.5 || localpos.y > 0.5 || localpos.z < -0.5 || localpos.z > 0.5){
+		discard;
+	}
+
+	vec2 decal_uv = localpos.xz + vec2(0.5);
+	vec4 color = texture(u_decal_texture, decal_uv);
+
+	FragColor = color;
+}
 
 
 // -------------------------------------------------------------------------------
