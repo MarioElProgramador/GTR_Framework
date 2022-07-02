@@ -43,16 +43,10 @@
 		{
 			"name": "itsme",
 			"type": "DECAL",
-			"position": [ 0, 0, 0 ],
-			"scale": [ 80, 30, 80 ],
-			"texture": "data/textures/MarioVP.png"
-		},
-		{
-			"name": "mario",
-			"type": "DECAL",
-			"position": [ 0, 0, 0 ],
-			"scale": [ 80, 30, 80 ],
-			"texture": "data/textures/Mario.png"
+			"texture": "data/textures/MarioVP.png",
+			"position": [ 50, 0, 50 ],
+			"scale": [ 80, 30, 30 ],
+			"angle": -30
 		},
 		{
 			"name": "sign",

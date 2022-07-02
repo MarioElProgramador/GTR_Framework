@@ -106,6 +106,7 @@ namespace GTR {
 		FBO* gbuffers_fbo;
 		FBO* illumination_fbo;
 		FBO* ssao_fbo;
+		FBO* irradiance_fbo;
 		FBO* reflection_fbo;
 		FBO* reflection_probe_fbo;
 		FBO* decal_fbo;
@@ -121,6 +122,7 @@ namespace GTR {
 
 		Texture* skybox;
 		Texture* cloned_depth_texture;
+		Texture* blur;
 
 		bool multilight;
 		bool show_gbuffers;
@@ -137,7 +139,6 @@ namespace GTR {
 		bool show_antial;
 		bool show_DoF;
 		bool show_volumetric;
-		bool show_gloom;
 
 		vector<Vector3> random_points;
 		Vector3 start_irr;
@@ -161,11 +162,10 @@ namespace GTR {
 		Renderer();
 
 		//add here your functions
-		
+
 		//renders diferent types
 		void renderForward(Camera* camera, GTR::Scene* scene);
 		void renderDeferred(Camera* camera, GTR::Scene* scene);
-		void renderSkybox(Camera* camera);
 
 		//renders several elements of the scene
 		void renderScene(GTR::Scene* scene, Camera* camera);
@@ -187,7 +187,9 @@ namespace GTR {
 		void generateShadowmap(LightEntity* light);
 		void renderFlatMesh(const Matrix44 model, Mesh* mesh, GTR::Material* material, Camera* camera);
 		void showShadowmap(LightEntity* light);
-	
+
+		void generateSkybox(Camera* camera);
+
 		//to render probes 
 		void generateProbe(GTR::Scene* scene);
 		void renderProbe(Vector3 pos, float size, float* coeffs);
@@ -198,9 +200,9 @@ namespace GTR {
 		void renderReflectionProbes(GTR::Scene* scene, Camera* camera);
 		void updateReflectionProbes(GTR::Scene* scene);
 		void captureReflectionProbe(GTR::Scene* scene, Texture* tex, Vector3 pos);
-		
+
 		void uploadUniformsAndTextures(Shader* shader, GTR::Material* material, Camera* camera, const Matrix44 model);
-		void uploadfx(Texture* color, Texture* depth, Camera* camera);
+		void applyfx(Texture* color, Texture* depth, Camera* camera);
 	};
 
 	vector<Vector3> generateSpherePoints(int num, float radius, bool hemi);

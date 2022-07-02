@@ -46,21 +46,21 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	mouse_locked = false;
 
 	//loads and compiles several shaders from one single file
-    //change to "data/shader_atlas_osx.txt" if you are in XCODE
+	//change to "data/shader_atlas_osx.txt" if you are in XCODE
 #ifdef __APPLE__
-    const char* shader_atlas_filename = "data/shader_atlas_osx.txt";
+	const char* shader_atlas_filename = "data/shader_atlas_osx.txt";
 #else
-    const char* shader_atlas_filename = "data/shader_atlas.txt";
+	const char* shader_atlas_filename = "data/shader_atlas.txt";
 #endif
-	if(!Shader::LoadAtlas(shader_atlas_filename))
-        exit(1);
-    checkGLErrors();
+	if (!Shader::LoadAtlas(shader_atlas_filename))
+		exit(1);
+	checkGLErrors();
 
 
 	// Create camera
 	camera = new Camera();
 	camera->lookAt(Vector3(-150.f, 150.0f, 250.f), Vector3(0.f, 0.0f, 0.f), Vector3(0.f, 1.f, 0.f));
-	camera->setPerspective( 45.f, window_width/(float)window_height, 1.0f, 10000.f);
+	camera->setPerspective(45.f, window_width / (float)window_height, 1.0f, 10000.f);
 
 	//Example of loading a prefab
 	//prefab = GTR::Prefab::Get("data/prefabs/gmc/scene.gltf");
@@ -90,10 +90,10 @@ void Application::render(void)
 
 	//set default flags
 	glDisable(GL_BLEND);
-    
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	if(render_wireframe)
+	if (render_wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -108,8 +108,8 @@ void Application::render(void)
 	//if(render_debug)
 		//drawGrid(); // No me termina de convencer la grid
 
-    glDisable(GL_DEPTH_TEST);
-    //render anything in the gui after this
+	glDisable(GL_DEPTH_TEST);
+	//render anything in the gui after this
 
 	//the swap buffers is done in the main loop after this function
 }
@@ -118,18 +118,18 @@ void Application::update(double seconds_elapsed)
 {
 	float speed = seconds_elapsed * cam_speed; //the speed is defined by the seconds_elapsed so it goes constant
 	float orbit_speed = seconds_elapsed * 0.5;
-	
+
 	//async input to move the camera around
 	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
 	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f,-1.0f) * speed);
+	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
 
 	//mouse input to rotate the cam
-	#ifndef SKIP_IMGUI
+#ifndef SKIP_IMGUI
 	if (!ImGuizmo::IsUsing())
-	#endif
+#endif
 	{
 		if (mouse_locked || Input::mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)) //move in first person view
 		{
@@ -140,25 +140,25 @@ void Application::update(double seconds_elapsed)
 		else //orbit around center
 		{
 			bool mouse_blocked = false;
-			#ifndef SKIP_IMGUI
-						mouse_blocked = ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive();
-			#endif
+#ifndef SKIP_IMGUI
+			mouse_blocked = ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive();
+#endif
 			if (Input::mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT) && !mouse_blocked) //is left button pressed?
 			{
 				camera->orbit(-Input::mouse_delta.x * orbit_speed, Input::mouse_delta.y * orbit_speed);
 			}
 		}
 	}
-	
+
 	//move up or down the camera using Q and E
 	if (Input::isKeyPressed(SDL_SCANCODE_Q)) camera->moveGlobal(Vector3(0.0f, -1.0f, 0.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_E)) camera->moveGlobal(Vector3(0.0f, 1.0f, 0.0f) * speed);
 
 	//to navigate with the mouse fixed in the middle
 	SDL_ShowCursor(!mouse_locked);
-	#ifndef SKIP_IMGUI
-		ImGui::SetMouseCursor(mouse_locked ? ImGuiMouseCursor_None : ImGuiMouseCursor_Arrow);
-	#endif
+#ifndef SKIP_IMGUI
+	ImGui::SetMouseCursor(mouse_locked ? ImGuiMouseCursor_None : ImGuiMouseCursor_Arrow);
+#endif
 	if (mouse_locked)
 	{
 		Input::centerMouse();
@@ -174,7 +174,7 @@ void Application::renderDebugGizmo()
 	//example of matrix we want to edit, change this to the matrix of your entity
 	Matrix44& matrix = selected_entity->model;
 
-	#ifndef SKIP_IMGUI
+#ifndef SKIP_IMGUI
 
 	static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
 	static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
@@ -231,7 +231,7 @@ void Application::renderDebugGizmo()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	ImGuizmo::Manipulate(camera->view_matrix.m, camera->projection_matrix.m, mCurrentGizmoOperation, mCurrentGizmoMode, matrix.m, NULL, useSnap ? &snap.x : NULL);
-	#endif
+#endif
 }
 
 
@@ -247,15 +247,39 @@ void Application::renderDebugGUI(void)
 	ImGui::ColorEdit3("BG color", scene->background_color.v);
 	ImGui::ColorEdit3("Ambient Light", scene->ambient_light.v);
 	ImGui::Combo("Light rendering [L]", (int*)&renderer->lightRender, "Singlepass\0Multipass", 2);
+
 	ImGui::Checkbox("Emissive texture", &scene->emissive);
 	ImGui::Checkbox("Occlussion texture", &scene->occlussion);
 	ImGui::Checkbox("Normal texture", &scene->normal);
+
 	ImGui::Combo("Pipeline [P]", (int*)&renderer->pipeline, "Forward\0Deferred", 2);
 	ImGui::Combo("Render Shape [G]", (int*)&renderer->renderShape, "Quads\0Geometry", 2);
+
 	ImGui::Checkbox("Show GBuffers", &renderer->show_gbuffers);
 	ImGui::Checkbox("Show SSAO", &renderer->show_ssao);
+
 	ImGui::Combo("Pipeline space [J]", (int*)&renderer->pipelineSpace, "Linear\0Gamma", 2);
 	ImGui::Combo("Dynamic range [H]", (int*)&renderer->dynamicRange, "SDR\0HDR", 2);
+
+	ImGui::Checkbox("Show Irradiance [I]", &renderer->show_irradiance);
+	ImGui::Checkbox("Show Reflections [R]", &renderer->show_reflections);
+
+	ImGui::Checkbox("Show Decal", &renderer->show_decal);
+	ImGui::Checkbox("Show ChromaticAberration / Lens Distortion", &renderer->show_chrab_lensdist);
+	ImGui::Checkbox("Show Motion Blur", &renderer->show_motblur);
+	ImGui::Checkbox("Show Antialiasing", &renderer->show_antial);
+	ImGui::Checkbox("Show Depth of Field", &renderer->show_DoF);
+
+	ImGui::SliderFloat("MinDistance", &renderer->minDist, 0.0, renderer->maxDist);
+	ImGui::SliderFloat("MaxDistance", &renderer->maxDist, 0.0, 900.0);
+	ImGui::SliderFloat("Factor", &renderer->deb_fac, 0.0, 5.0);
+
+	ImGui::Checkbox("Show volumetric", &renderer->show_volumetric);
+
+	ImGui::SliderFloat("Intensity Factor", &renderer->intensity_factor, 0.0, 5.0);
+	ImGui::SliderFloat("Contrast", &renderer->contrast, 0.0, 2.0);
+	ImGui::SliderFloat("Threshold", &renderer->threshold, 0.0, 2.0);
+	ImGui::SliderFloat("Air density", &renderer->air_density, 0.0, 10.0);
 
 	//add info to the debug panel about the camera
 	if (ImGui::TreeNode(camera, "Camera")) {
@@ -270,7 +294,7 @@ void Application::renderDebugGUI(void)
 	{
 		GTR::BaseEntity* entity = scene->entities[i];
 
-		if(selected_entity == entity)
+		if (selected_entity == entity)
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.0f));
 
 		if (ImGui::TreeNode(entity, entity->name.c_str()))
@@ -291,25 +315,36 @@ void Application::renderDebugGUI(void)
 }
 
 //Keyboard event handler (sync input)
-void Application::onKeyDown( SDL_KeyboardEvent event )
+void Application::onKeyDown(SDL_KeyboardEvent event)
 {
-	switch(event.keysym.sym)
+	switch (event.keysym.sym)
 	{
-		case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
-		case SDLK_F1: render_debug = !render_debug; break; // Debug / No debug
-		case SDLK_f: camera->center.set(0, 0, 0); camera->updateViewMatrix(); break; // Center
-		case SDLK_p: renderer->pipeline = (renderer->pipeline == GTR::Renderer::FORWARD ? GTR::Renderer::DEFERRED : GTR::Renderer::FORWARD); break; // Forward / Deferred
-		case SDLK_g: renderer->renderShape = (renderer->renderShape == GTR::Renderer::QUAD ? GTR::Renderer::GEOMETRY : GTR::Renderer::QUAD); break; // Quad / Geometry
-		case SDLK_j: renderer->pipelineSpace = (renderer->pipelineSpace == GTR::Renderer::LINEAR ? GTR::Renderer::GAMMA : GTR::Renderer::LINEAR); break; // Linear / Gamma
-		case SDLK_h: renderer->dynamicRange = (renderer->dynamicRange == GTR::Renderer::SDR ? GTR::Renderer::HDR : GTR::Renderer::SDR); break; // SDR / HDR
-		case SDLK_l: renderer->lightRender = (renderer->lightRender == GTR::Renderer::eLightRender::MULTIPASS ? GTR::Renderer::eLightRender::SINGLEPASS : GTR::Renderer::eLightRender::MULTIPASS); break; // Multipass / Singlepass
-		case SDLK_F5: Shader::ReloadAll(); break;
-		case SDLK_F6:
-			scene->clear();
-			scene->load(scene->filename.c_str());
-			camera->lookAt(scene->main_camera.eye, scene->main_camera.center, Vector3(0, 1, 0));
-			camera->fov = scene->main_camera.fov;
-			break;
+	case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
+	case SDLK_F1: render_debug = !render_debug; break; // Debug / No debug
+	case SDLK_f: camera->center.set(0, 0, 0); camera->updateViewMatrix(); break; // Center
+	case SDLK_p: renderer->pipeline = (renderer->pipeline == GTR::Renderer::FORWARD ? GTR::Renderer::DEFERRED : GTR::Renderer::FORWARD); break; // Forward / Deferred
+	case SDLK_g: renderer->renderShape = (renderer->renderShape == GTR::Renderer::QUAD ? GTR::Renderer::GEOMETRY : GTR::Renderer::QUAD); break; // Quad / Geometry
+	case SDLK_j: renderer->pipelineSpace = (renderer->pipelineSpace == GTR::Renderer::LINEAR ? GTR::Renderer::GAMMA : GTR::Renderer::LINEAR); break; // Linear / Gamma
+	case SDLK_h: renderer->dynamicRange = (renderer->dynamicRange == GTR::Renderer::SDR ? GTR::Renderer::HDR : GTR::Renderer::SDR); break; // SDR / HDR
+	case SDLK_l: renderer->lightRender = (renderer->lightRender == GTR::Renderer::eLightRender::MULTIPASS ? GTR::Renderer::eLightRender::SINGLEPASS : GTR::Renderer::eLightRender::MULTIPASS); break; // Multipass / Singlepass
+	case SDLK_i: renderer->show_irradiance = !renderer->show_irradiance; break; // Irradiance
+ 	case SDLK_r: renderer->show_reflections = !renderer->show_reflections; break; // Reflective
+
+	// PROBES
+	case SDLK_1: renderer->show_probes = !renderer->show_probes; break;
+	case SDLK_2: renderer->show_probes_texture = !renderer->show_probes_texture; break;
+	case SDLK_3: renderer->show_reflection_probes = !renderer->show_reflection_probes; break;
+	case SDLK_4: renderer->generateProbe(scene); break;
+	case SDLK_5: renderer->updateReflectionProbes(scene); break;
+	case SDLK_6: renderer->loadProbes(); break;
+
+	case SDLK_F5: Shader::ReloadAll(); break;
+	case SDLK_F6:
+		scene->clear();
+		scene->load(scene->filename.c_str());
+		camera->lookAt(scene->main_camera.eye, scene->main_camera.center, Vector3(0, 1, 0));
+		camera->fov = scene->main_camera.fov;
+		break;
 	}
 }
 
@@ -327,7 +362,7 @@ void Application::onGamepadButtonUp(SDL_JoyButtonEvent event)
 
 }
 
-void Application::onMouseButtonDown( SDL_MouseButtonEvent event )
+void Application::onMouseButtonDown(SDL_MouseButtonEvent event)
 {
 	if (event.button == SDL_BUTTON_MIDDLE) //middle mouse
 	{
@@ -345,21 +380,21 @@ void Application::onMouseWheel(SDL_MouseWheelEvent event)
 {
 	bool mouse_blocked = false;
 
-	#ifndef SKIP_IMGUI
-		ImGuiIO& io = ImGui::GetIO();
-		if(!mouse_locked)
+#ifndef SKIP_IMGUI
+	ImGuiIO& io = ImGui::GetIO();
+	if (!mouse_locked)
 		switch (event.type)
 		{
-			case SDL_MOUSEWHEEL:
-			{
-				if (event.x > 0) io.MouseWheelH += 1;
-				if (event.x < 0) io.MouseWheelH -= 1;
-				if (event.y > 0) io.MouseWheel += 1;
-				if (event.y < 0) io.MouseWheel -= 1;
-			}
+		case SDL_MOUSEWHEEL:
+		{
+			if (event.x > 0) io.MouseWheelH += 1;
+			if (event.x < 0) io.MouseWheelH -= 1;
+			if (event.y > 0) io.MouseWheel += 1;
+			if (event.y < 0) io.MouseWheel -= 1;
 		}
-		mouse_blocked = ImGui::IsAnyWindowHovered();
-	#endif
+		}
+	mouse_blocked = ImGui::IsAnyWindowHovered();
+#endif
 
 	if (!mouse_blocked && event.y)
 	{
@@ -372,10 +407,9 @@ void Application::onMouseWheel(SDL_MouseWheelEvent event)
 
 void Application::onResize(int width, int height)
 {
-    std::cout << "window resized: " << width << "," << height << std::endl;
-	glViewport( 0,0, width, height );
-	camera->aspect =  width / (float)height;
+	std::cout << "window resized: " << width << "," << height << std::endl;
+	glViewport(0, 0, width, height);
+	camera->aspect = width / (float)height;
 	window_width = width;
 	window_height = height;
 }
-

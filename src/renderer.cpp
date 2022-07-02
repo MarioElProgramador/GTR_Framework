@@ -18,18 +18,105 @@
 using namespace GTR;
 
 GTR::Renderer::Renderer() {
+
 	lightRender = MULTIPASS;
 	pipeline = DEFERRED;
 	renderShape = GEOMETRY;
 	pipelineSpace = GAMMA;
 	dynamicRange = HDR;
+
 	gbuffers_fbo = NULL;
 	illumination_fbo = NULL;
 	ssao_fbo = NULL;
 	ssao_blur = NULL;
+	probes_texture = NULL;
+	irradiance_fbo = NULL;
+	volumetric_fbo = NULL;
+
+	reflection_fbo = new FBO();
+	reflection_fbo->create(Application::instance->window_width, Application::instance->window_height);
+	reflection_probe_fbo = new FBO();
+
+	multilight = true;
 	show_gbuffers = false;
 	show_ssao = false;
+	show_probes = false;
+	show_reflection_probes = false;
+	show_probes_texture = false;
+	show_irradiance = false;
+	show_reflections = false;
+	show_decal = false;
+	is_rendering_reflections = false;
+	show_chrab_lensdist = false;
+	show_motblur = false;
+	show_antial = false;
+	show_DoF = false;
+	show_volumetric = false;
+
 	random_points = generateSpherePoints(64, 1, true);
+	skybox = CubemapFromHDRE("data/pisa.hdre");
+
+	cloned_depth_texture = NULL;
+	decal_fbo = NULL;
+	cube.createCube();
+	postFX_textureA = NULL;
+	postFX_textureB = NULL;
+	postFX_textureC = NULL;
+	postFX_textureD = NULL;
+
+	blur = NULL;
+	directional = NULL;
+	deb_fac = 1.0;
+	minDist = 1.0;
+	maxDist = 300.0;
+	air_density = 1.0;
+	intensity_factor = 1.0;
+	contrast = 1.0;
+	threshold = 1.0;
+
+	loadProbes();
+
+	// MIRAAAAAAR
+	//create the probe
+	sReflectionProbe* probe = new sReflectionProbe;
+	//set it up
+	probe->pos.set(90, 56, -72);
+	probe->cubemap = new Texture();
+	probe->cubemap->createCubemap(512, 512, NULL, GL_RGB, GL_UNSIGNED_INT, true);
+	//add it to the list
+	reflection_probes.push_back(probe);
+
+	probe = new sReflectionProbe;
+	probe->pos.set(90, 56, 128);
+	probe->cubemap = new Texture();
+	probe->cubemap->createCubemap(512, 512, NULL, GL_RGB, GL_UNSIGNED_INT, true);
+	reflection_probes.push_back(probe);
+
+	probe = new sReflectionProbe;
+	probe->pos.set(90, 56, 328);
+	probe->cubemap = new Texture();
+	probe->cubemap->createCubemap(512, 512, NULL, GL_RGB, GL_UNSIGNED_INT, true);
+	reflection_probes.push_back(probe);
+}
+
+void GTR::Renderer::generateSkybox(Camera* camera) {
+	Mesh* mesh = Mesh::Get("data/meshes/sphere.obj", false);
+	Shader* shader = Shader::Get("skybox");
+	Matrix44 model;
+	model.setTranslation(camera->eye.x, camera->eye.y, camera->eye.z);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+
+	shader->enable();
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	shader->setUniform("u_camera_position", camera->eye);
+	shader->setUniform("u_model", model);
+	shader->setUniform("u_texture", skybox, 0);
+	mesh->render(GL_TRIANGLES);
+	shader->disable();
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 vector<Vector3> GTR::generateSpherePoints(int num, float radius, bool hemi) {
@@ -62,10 +149,19 @@ void GTR::Renderer::renderForward(Camera* camera, GTR::Scene* scene) {
 	// Clear the color and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	checkGLErrors();
+
+	generateSkybox(camera);
+
 	for (vector<GTR::RenderCall>::iterator rc = render_calls.begin(); rc != render_calls.end(); ++rc) {
 		if (camera->testBoxInFrustum(rc->world_bounding.center, rc->world_bounding.halfsize))
 			renderMeshWithMaterialAndLighting(rc->model, rc->mesh, rc->material, camera);
 	}
+
+	if (show_probes)
+		for (int i = 0; i < probes.size(); i++)
+			renderProbe(probes[i].pos, 2, probes[i].sh.coeffs[0].v);
+	if (show_reflection_probes)
+		renderReflectionProbes(scene, camera);
 }
 
 void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
@@ -104,9 +200,34 @@ void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
 		ssao_blur = new Texture();
 		ssao_blur->create(width, height);
 	}
+	if (!decal_fbo) {
+		decal_fbo = new FBO();
+		decal_fbo->create(width, height,
+			3,			//one texture
+			GL_RGBA,			//three channels
+			GL_UNSIGNED_BYTE,	//1 byte
+			true);		//add depth_texture
+	}
+	if (!postFX_textureA) {
+		postFX_textureA = new Texture(width, height, GL_RGB, GL_FLOAT, false);
+	}
+	if (!postFX_textureB) {
+		postFX_textureB = new Texture(width, height, GL_RGB, GL_FLOAT, false);
+	}
+	if (!postFX_textureC) {
+		postFX_textureC = new Texture(width, height, GL_RGB, GL_FLOAT, false);
+	}
+	if (!postFX_textureD) {
+		postFX_textureD = new Texture(width, height, GL_RGB, GL_FLOAT, false);
+	}
+	if (!blur) {
+		blur = new Texture(width, height, GL_RGB, GL_FLOAT, false);
+	}
 
 	Mesh* quad = Mesh::getQuad();
 	Mesh* sphere = Mesh::Get("data/meshes/sphere.obj", false);
+	Matrix44 inv_view = camera->view_matrix;
+	inv_view.inverse();
 	Matrix44 inv_vp = camera->viewprojection_matrix;
 	inv_vp.inverse();
 
@@ -126,6 +247,46 @@ void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
 	}
 
 	gbuffers_fbo->unbind();
+
+	gbuffers_fbo->color_textures[0]->copyTo(decal_fbo->color_textures[0]);
+	gbuffers_fbo->color_textures[1]->copyTo(decal_fbo->color_textures[1]);
+	gbuffers_fbo->color_textures[2]->copyTo(decal_fbo->color_textures[2]);
+
+	decal_fbo->bind();
+	gbuffers_fbo->depth_texture->copyTo(NULL);
+	decal_fbo->unbind();
+
+	if (decals.size() && show_decal) {
+		gbuffers_fbo->bind();
+
+		Shader* shader = Shader::Get("decal");
+		shader->enable();
+		shader->setUniform("u_depth_texture", decal_fbo->depth_texture, 6);
+		shader->setUniform("u_inverse_viewprojection", inv_vp);
+		shader->setUniform("u_iRes", Vector2(1.0 / (float)width, 1.0 / (float)height));
+		shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glColorMask(true, true, true, false);
+
+		for (int i = 0; i < decals.size(); i++) {
+			DecalEntity* decal = decals[i];
+			shader->setUniform("u_model", decal->model);
+			Matrix44 inv_decal_model = decal->model;
+			inv_decal_model.inverse();
+			shader->setUniform("u_imodel", inv_decal_model);
+			Texture* decal_texture = Texture::Get(decal->texture.c_str());
+			if (!decal_texture) continue;
+			shader->setUniform("u_texture", decal_texture, 7);
+			cube.render(GL_TRIANGLES);
+		}
+
+		glColorMask(true, true, true, true);
+		glDisable(GL_BLEND);
+		gbuffers_fbo->unbind();
+	}
 
 	ssao_fbo->bind();
 
@@ -167,13 +328,7 @@ void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
 
 	int num_lights = lights.size();
 
-	// Multipass
-	for (int i = 0; i < num_lights; i++) {
-		LightEntity* light = lights[i];
-		if (light->light_type == DIRECTIONAL) { // DIRECTIONAL light
-			uploadLightToShaderMultipass(light, shader);
-		}
-	}
+	uploadLightToShaderMultipass(directional, shader);
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
@@ -233,8 +388,25 @@ void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
 			shader->setUniform("u_emissive_factor", Vector3());
 		}
 	}
+
 	glDisable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
+
+	if (probes_texture && show_irradiance) {
+		shader = Shader::Get("irradiance");
+		shader->enable();
+		uploadLightToShaderDeferred(shader, inv_vp, width, height, camera);
+		shader->setUniform("u_inv_view_matrix", inv_view);
+		shader->setUniform("u_probes_texture", probes_texture, 5);
+		shader->setUniform("u_irr_start", start_irr);
+		shader->setUniform("u_irr_end", end_irr);
+		shader->setUniform("u_irr_dim", dim_irr);
+		shader->setUniform("u_irr_normal_distance", 0.1f);
+		shader->setUniform("u_irr_delta", delta);
+		shader->setUniform("u_num_probes", probes_texture->height);
+
+		quad->render(GL_TRIANGLES);
+	}
 
 	// To enable the z-buffer so the grid does not appear over the objects
 	glEnable(GL_DEPTH_TEST);
@@ -247,8 +419,27 @@ void GTR::Renderer::renderDeferred(Camera* camera, GTR::Scene* scene) {
 	}
 
 	illumination_fbo->unbind();
-	glDisable(GL_BLEND);
-	illumination_fbo->color_textures[0]->toViewport();
+
+	applyfx(illumination_fbo->color_textures[0], gbuffers_fbo->depth_texture, camera);
+
+	if (show_volumetric) {
+		if (!volumetric_fbo) {
+			volumetric_fbo = new FBO();
+			volumetric_fbo->create(width, height, 1, GL_RGBA);
+		}
+
+		volumetric_fbo->bind();
+		shader = Shader::Get("volumetric");
+		shader->enable();
+		uploadLightToShaderDeferred(shader, inv_vp, width, height, camera);
+		uploadLightToShaderSinglepass(shader);
+		shader->setUniform("u_air_density", air_density * 0.001f);
+		quad->render(GL_TRIANGLES);
+		volumetric_fbo->unbind();
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		volumetric_fbo->color_textures[0]->toViewport();
+	}
 
 	if (show_gbuffers) {
 		glViewport(0, height * 0.5, width * 0.5, height * 0.5);
@@ -276,6 +467,7 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 {
 	lights.clear();
 	render_calls.clear();
+	decals.clear();
 
 	//rendering entities
 	for (int i = 0; i < scene->entities.size(); ++i) {
@@ -288,6 +480,8 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 		{
 			LightEntity* light = (GTR::LightEntity*)ent;
 			lights.push_back(light);
+			if (light->light_type == DIRECTIONAL)
+				directional = light;
 		}
 
 		//is a prefab!
@@ -297,6 +491,13 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 			if (pent->prefab) {
 				renderPrefab(ent->model, pent->prefab, camera);
 			}
+		}
+
+		//is a decal!
+		if (ent->entity_type == DECALL)
+		{
+			DecalEntity* decal = (GTR::DecalEntity*)ent;
+			decals.push_back(decal);
 		}
 	}
 
@@ -309,10 +510,28 @@ void Renderer::renderScene(GTR::Scene* scene, Camera* camera)
 
 	//rendercalls
 	sort(render_calls.begin(), render_calls.end(), std::greater<RenderCall>());
-	if (pipeline == FORWARD)
+	// Forward
+	if (pipeline == FORWARD) {
+		if (show_reflections) {
+			reflection_fbo->bind();
+			Camera flipped_camera;
+			flipped_camera.lookAt(camera->eye * Vector3(1, -1, 1), camera->center * Vector3(1, -1, 1), Vector3(0, -1, 0));
+			flipped_camera.setPerspective(camera->fov, camera->aspect, camera->near_plane, camera->far_plane);
+			flipped_camera.enable();
+			is_rendering_reflections = true;
+			renderForward(&flipped_camera, scene);
+			is_rendering_reflections = false;
+			reflection_fbo->unbind();
+			camera->enable();
+		}
 		renderForward(camera, scene);
+	}
+	// Deferred
 	else if (pipeline == DEFERRED)
 		renderDeferred(camera, scene);
+
+	if (probes_texture && show_probes_texture)
+		probes_texture->toViewport();
 }
 
 //renders all the prefab
@@ -480,7 +699,7 @@ void Renderer::renderMeshWithMaterialAndLighting(const Matrix44 model, Mesh* mes
 				}
 			}
 			else {
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE); 
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 				glEnable(GL_BLEND);
 			}
@@ -758,7 +977,7 @@ void GTR::Renderer::uploadLightToShaderDeferred(Shader* shader, Matrix44 inv_vp,
 }
 
 // Textures (emissive, occlusion, metallic...)
-void GTR::Renderer::uploadUniformsAndTextures(Shader* shader, GTR::Material* material, Camera* camera, const Matrix44 model) {
+void GTR::Renderer::uploadUniformsAndTextures(Shader* shader, GTR::Material* material, Camera* camera, Matrix44 model) {
 	Texture* texture = NULL;
 	Texture* emissive_texture = NULL;
 	Texture* occlusion_texture = NULL;
@@ -800,7 +1019,7 @@ void GTR::Renderer::uploadUniformsAndTextures(Shader* shader, GTR::Material* mat
 		shader->setUniform("u_emissive_factor", emissive_factor);
 	}
 	else {
-		shader->setUniform("u_emissive_factor", Vector3());
+		shader->setUniform("u_emissive_factor", emissive_factor);
 	}
 	if (occlusion_texture)
 		shader->setUniform("u_occlusion_texture", occlusion_texture, 2);
@@ -819,4 +1038,363 @@ void GTR::Renderer::uploadUniformsAndTextures(Shader* shader, GTR::Material* mat
 
 	//this is used to say which is the alpha threshold to what we should not paint a pixel on the screen (to cut polygons according to texture alpha)
 	shader->setUniform("u_alpha_cutoff", material->alpha_mode == GTR::eAlphaMode::MASK ? material->alpha_cutoff : 0);
+
+	if (!is_rendering_reflections && reflection_probes.size() > 0) {
+		sReflectionProbe* rprobe = reflection_probes[0];
+		Vector3 modelPos = model.getTranslation();
+		for (int i = 1; i < reflection_probes.size(); i++) {
+			sReflectionProbe* newrprobe = reflection_probes[i];
+			if (newrprobe->pos.distance(modelPos) < rprobe->pos.distance(modelPos)) {
+				rprobe = newrprobe;
+			}
+		}
+		if (!rprobe->cubemap)
+			shader->setUniform("is_reflection", 0);
+		else {
+			shader->setUniform("is_reflection", show_reflections);
+			shader->setUniform("u_reflection_texture", rprobe->cubemap, 10);
+		}
+	}
+	else {
+		shader->setUniform("is_reflection", 0);
+	}
+}
+
+// Generate Probes
+void GTR::Renderer::generateProbe(GTR::Scene* scene) {
+	//define the corners of the axis aligned grid
+	//this can be done using the boundings of our scene
+	start_irr.set(-300, 5, -400);
+	end_irr.set(300, 150, 400);
+
+	//define how many probes you want per dimension
+	dim_irr.set(10, 6, 10);
+
+	//compute the vector from one corner to the other
+	delta = (end_irr - start_irr);
+
+	probes.clear();
+
+	//and scale it down according to the subdivisions
+	//we substract one to be sure the last probe is at end pos
+	delta.x /= (dim_irr.x - 1);
+	delta.y /= (dim_irr.y - 1);
+	delta.z /= (dim_irr.z - 1);
+	for (int z = 0; z < dim_irr.z; ++z) {
+		for (int y = 0; y < dim_irr.y; ++y) {
+			for (int x = 0; x < dim_irr.x; ++x) {
+				sProbe p;
+				p.local.set(x, y, z);
+
+				//index in the linear array
+				p.index = x + y * dim_irr.x + z * dim_irr.x * dim_irr.y;
+
+				//and its position
+				p.pos = start_irr + delta * Vector3(x, y, z);
+				probes.push_back(p);
+			}
+		}
+	}
+
+	for (int iP = 0; iP < probes.size(); ++iP) {
+		int probe_index = iP;
+		captureProbe(probes[iP], scene);
+		std::cout << "Generating probe number " << iP << " de " << probes.size() << std::endl;
+	}
+
+	if (probes_texture != NULL) delete probes_texture;
+
+	cout << "DONE" << endl;
+
+	uploadProbesToGPU();
+
+	// saveIrradianceToDisk ---------------------------------
+
+	//fill header structure
+	sIrrHeader header;
+
+	header.start = start_irr;
+	header.end = end_irr;
+	header.dims = dim_irr;
+	header.delta = delta;
+	header.num_probes = dim_irr.x * dim_irr.y * dim_irr.z;
+
+	//write to file header and probes data
+	FILE* f = fopen("irradiance.bin", "wb");
+	fwrite(&header, sizeof(header), 1, f);
+	fwrite(&(probes[0]), sizeof(sProbe), probes.size(), f);
+	fclose(f);
+}
+
+bool Renderer::loadProbes() {
+	//load probes info from disk
+	FILE* f = fopen("irradiance.bin", "rb");
+	if (!f)
+		return false;
+
+	//read header
+	sIrrHeader header;
+	fread(&header, sizeof(header), 1, f);
+
+	//copy info from header to our local vars
+	start_irr = header.start;
+	end_irr = header.end;
+	dim_irr = header.dims;
+	delta = header.delta;
+	int num_probes = header.num_probes;
+
+	//allocate space for the probes
+	probes.resize(num_probes);
+
+	//read from disk directly to our probes container in memory
+	fread(&probes[0], sizeof(sProbe), probes.size(), f);
+	fclose(f);
+
+	uploadProbesToGPU();
+}
+
+void GTR::Renderer::uploadProbesToGPU() {
+	//create the texture to store the probes (do this ONCE!!!)
+	if (probes_texture == NULL) {
+		delete probes_texture;
+	}
+	probes_texture = new Texture(
+		9, //9 coefficients per probe
+		probes.size(), //as many rows as probes
+		GL_RGB, //3 channels per coefficient
+		GL_FLOAT); //they require a high range
+
+	SphericalHarmonics* sh_data = NULL;
+	sh_data = new SphericalHarmonics[dim_irr.x * dim_irr.y * dim_irr.z];
+
+	//here we fill the data of the array with our probes in x,y,z order
+	for (int i = 0; i < probes.size(); ++i)
+		sh_data[i] = probes[i].sh;
+
+	//now upload the data to the GPU as a texture
+	probes_texture->upload(GL_RGB, GL_FLOAT, false, (uint8*)sh_data);
+
+	//disable any texture filtering when reading
+	probes_texture->bind();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	//always free memory after allocating it!!!
+	delete[] sh_data;
+}
+
+void GTR::Renderer::renderProbe(Vector3 pos, float size, float* coeffs) {
+	Camera* camera = Camera::current;
+	Shader* shader = Shader::Get("probe");
+	Mesh* mesh = Mesh::Get("data/meshes/sphere.obj", false);
+
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+
+	Matrix44 model;
+	model.setTranslation(pos.x, pos.y, pos.z);
+	model.scale(size, size, size);
+
+	shader->enable();
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	shader->setUniform("u_camera_position", camera->eye);
+	shader->setUniform("u_model", model);
+	shader->setUniform3Array("u_coeffs", coeffs, 9);
+
+	mesh->render(GL_TRIANGLES);
+}
+
+void GTR::Renderer::captureProbe(sProbe& probe, GTR::Scene* scene) {
+	FloatImage images[6]; //here we will store the six views
+	Camera camera;
+
+	if (irradiance_fbo == NULL) {
+		irradiance_fbo = new FBO();
+		irradiance_fbo->create(64, 64, 1, GL_RGB, GL_FLOAT);
+	}
+	//set the fov to 90 and the aspect to 1
+	camera.setPerspective(90, 1, 0.1, 1000);
+
+	for (int i = 0; i < 6; ++i) //for every cubemap face
+	{
+		//compute camera orientation using defined vectors
+		Vector3 eye = probe.pos;
+		Vector3 front = cubemapFaceNormals[i][2];
+		Vector3 center = probe.pos + front;
+		Vector3 up = cubemapFaceNormals[i][1];
+		camera.lookAt(eye, center, up);
+		camera.enable();
+
+		//render the scene from this point of view
+		irradiance_fbo->bind();
+		renderForward(&camera, scene);
+		irradiance_fbo->unbind();
+
+		//read the pixels back and store in a FloatImage
+		images[i].fromTexture(irradiance_fbo->color_textures[0]);
+	}
+
+	//compute the coefficients given the six images
+	probe.sh = computeSH(images);
+}
+
+void GTR::Renderer::renderReflectionProbes(GTR::Scene* scene, Camera* camera) {
+	Mesh* mesh = Mesh::Get("data/meshes/sphere.obj", false);
+	Shader* shader = Shader::Get("reflection_probe");
+	shader->enable();
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	shader->setUniform("u_camera_position", camera->eye);
+	Matrix44 model;
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	for (int i = 0; i < reflection_probes.size(); i++) {
+		sReflectionProbe* probe = reflection_probes[i];
+		if (!probe->cubemap)
+			continue;
+		model.setTranslation(probe->pos.x, probe->pos.y, probe->pos.z);
+		shader->setUniform("u_model", model);
+		shader->setUniform("u_texture", probe->cubemap, 0);
+
+		mesh->render(GL_TRIANGLES);
+	}
+	shader->disable();
+}
+
+void GTR::Renderer::updateReflectionProbes(GTR::Scene* scene) {
+	for (int i = 0; i < reflection_probes.size(); i++) {
+		sReflectionProbe* probe = reflection_probes[i];
+		if (!probe->cubemap) {
+			probe->cubemap = new Texture();
+			probe->cubemap->createCubemap(512, 512, NULL, GL_RGB, GL_UNSIGNED_INT, true);
+		}
+		captureReflectionProbe(scene, probe->cubemap, probe->pos);
+	}
+}
+
+void GTR::Renderer::captureReflectionProbe(GTR::Scene* scene, Texture* tex, Vector3 pos) {
+	Camera camera;
+
+	for (int i = 0; i < 6; i++) {
+		reflection_probe_fbo->setTexture(tex, i);
+		camera.setPerspective(90, 1, 0.1, 1000);
+		Vector3 eye = pos;
+		Vector3 center = pos + cubemapFaceNormals[i][2];
+		Vector3 up = cubemapFaceNormals[i][1];
+		camera.lookAt(eye, center, up);
+		camera.enable();
+		reflection_probe_fbo->bind();
+		is_rendering_reflections = true;
+		renderForward(&camera, scene);
+		is_rendering_reflections = false;
+		reflection_probe_fbo->unbind();
+	}
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	tex->generateMipmaps();
+}
+
+void GTR::Renderer::applyfx(Texture* color, Texture* depth, Camera* camera) {
+	Texture* current_texture = color;
+	int width = Application::instance->window_width;
+	int height = Application::instance->window_height;
+	Matrix44 inv_vp = camera->viewprojection_matrix;
+	inv_vp.inverse();
+
+	//Depth of Field
+	if (show_DoF) {
+		//Blur
+		FBO* blur_fbo;
+		Shader* blur_shader;
+		for (int i = 0; i < 16; i++) {
+			blur_fbo = Texture::getGlobalFBO(postFX_textureA);
+			blur_fbo->bind();
+			blur_shader = Shader::Get("blurredof");
+			blur_shader->enable();
+			blur_shader->setUniform("u_offset", vec2(pow(1.0f, i) / current_texture->width, 0.0) * deb_fac);
+			blur_shader->setUniform("u_intensity", 1.0f);
+			current_texture->toViewport(blur_shader);
+			blur_shader->disable();
+			blur_fbo->unbind();
+
+			blur_fbo = Texture::getGlobalFBO(blur);
+			blur_fbo->bind();
+			blur_shader = Shader::Get("blurredof");
+			blur_shader->enable();
+			blur_shader->setUniform("u_offset", vec2(0.0, pow(1.0f, i) / current_texture->height) * deb_fac);
+			blur_shader->setUniform("u_intensity", 1.0f);
+			postFX_textureA->toViewport(blur_shader);
+			blur_shader->disable();
+			blur_fbo->unbind();
+			current_texture = blur;
+		}
+		current_texture = color;
+
+		//Depth of Field
+		FBO* dof_fbo = Texture::getGlobalFBO(postFX_textureA);
+		dof_fbo->bind();
+		Shader* dof_shader = Shader::Get("depth_of_field");
+		dof_shader->enable();
+		dof_shader->setUniform("u_outoffocus_texture", blur, 2);
+		dof_shader->setUniform("u_depth_texture", depth, 3);
+		dof_shader->setUniform("u_inverse_viewprojection", inv_vp);
+		dof_shader->setUniform("minDistance", minDist);
+		dof_shader->setUniform("maxDistance", maxDist);
+		current_texture->toViewport(dof_shader);
+		dof_shader->disable();
+		dof_fbo->unbind();
+		current_texture = postFX_textureA;
+		swap(postFX_textureA, postFX_textureB);
+	}
+
+	//Chromatic aberration and lens distortion
+	if (show_chrab_lensdist) {
+		FBO* ch_fbo = Texture::getGlobalFBO(postFX_textureA);
+		ch_fbo->bind();
+		Shader* ch_shader = Shader::Get("chrlen");
+		ch_shader->enable();
+		ch_shader->setUniform("resolution", Vector2((float)width, (float)height));
+		current_texture->toViewport(ch_shader);
+		ch_shader->disable();
+		ch_fbo->unbind();
+		current_texture = postFX_textureA;
+		swap(postFX_textureA, postFX_textureB);
+	}
+
+	//Motion blur
+	if (show_motblur) {
+		FBO* mot_fbo = Texture::getGlobalFBO(postFX_textureA);
+		mot_fbo->bind();
+		Shader* mot_shader = Shader::Get("motionblur");
+		mot_shader->enable();
+		mot_shader->setUniform("u_depth_texture", depth, 1);
+		mot_shader->setUniform("u_inverse_viewprojection", inv_vp);
+		mot_shader->setUniform("u_viewprojection_old", viewproj_old);
+		current_texture->toViewport(mot_shader);
+		mot_shader->disable();
+		mot_fbo->unbind();
+		current_texture = postFX_textureA;
+		swap(postFX_textureA, postFX_textureB);
+		viewproj_old = camera->viewprojection_matrix;
+	}
+
+	//Antialiasing
+	if (show_antial) {
+		FBO* al_fbo = Texture::getGlobalFBO(postFX_textureA);
+		al_fbo->bind();
+		Shader* al_shader = Shader::Get("antialiasing");
+		al_shader->enable();
+		al_shader->setUniform("u_viewportSize", Vector2((float)width, (float)height));
+		al_shader->setUniform("u_iViewportSize", Vector2(1.0 / (float)width, 1.0 / (float)height));
+		current_texture->toViewport(al_shader);
+		al_shader->disable();
+		al_fbo->unbind();
+		current_texture = postFX_textureA;
+		swap(postFX_textureA, postFX_textureB);
+	}
+
+	//Tonemapper
+	glDisable(GL_BLEND);
+	Shader* shader_tm = Shader::Get("tonemapper");
+	shader_tm->enable();
+	current_texture->toViewport(shader_tm);
 }
